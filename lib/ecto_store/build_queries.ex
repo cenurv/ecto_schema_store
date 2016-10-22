@@ -56,11 +56,11 @@ defmodule EctoStore.BuildQueries do
         end
 
         def build_query(filters \\ %{}) do
-          build_query unquote(schema), filters
+          build_query unquote(schema), alias_filters(filters)
         end
 
         def build_query!(filters \\ %{}) do
-          case build_query(unquote(schema), filters) do
+          case build_query(filters) do
             {:error, reason} -> throw reason
             {:ok, query} -> query
           end
