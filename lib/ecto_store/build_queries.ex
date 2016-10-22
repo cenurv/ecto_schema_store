@@ -1,12 +1,6 @@
 defmodule EctoStore.BuildQueries do
   defmacro build(schema) do
-    schema = Macro.expand(schema, __CALLER__)
-    impl = struct schema
-    keys = Map.keys impl
-
-    ignore = [:__struct__, :__meta__]
-
-    keys = Enum.filter keys, &((&1 in ignore) == false)
+    keys = EctoStore.Utils.keys(Macro.expand(schema, __CALLER__))
 
     # Save to generate AST in the future.
     # IO.inspect(
