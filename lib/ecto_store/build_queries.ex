@@ -1,4 +1,4 @@
-defmodule EctoStore.BuildParams do
+defmodule EctoStore.BuildQueries do
   defmacro build(schema) do
     schema = Macro.expand(schema, __CALLER__)
     impl = struct schema
@@ -22,29 +22,29 @@ defmodule EctoStore.BuildParams do
 
     functions =
       for key <- keys do
-        param = Keyword.put([], key, {:value, [], EctoStore.BuildParams})
-        query = [{:q, [], EctoStore.BuildParams}, key]
+        param = Keyword.put([], key, {:value, [], EctoStore})
+        query = [{:q, [], EctoStore}, key]
 
-        {:defp, [context: EctoStore.BuildParams, import: Kernel],
-        [{:build_query, [context: EctoStore.BuildParams],
-          [{:query, [], EctoStore.BuildParams},
+        {:defp, [context: EctoStore, import: Kernel],
+        [{:build_query, [context: EctoStore],
+          [{:query, [], EctoStore},
             {:=, [],
             [{:%{}, [], param},
-              {:filters, [], EctoStore.BuildParams}]}]},                                                                                                                                                
+              {:filters, [], EctoStore}]}]},                                                                                                                                                
           [do: {:__block__, [],                                                                                                                                                                         
             [{:=, [],                                                                                                                                                                                   
-              [{:query, [], EctoStore.BuildParams},                                                                                                                                                     
+              [{:query, [], EctoStore},                                                                                                                                                     
               {:from, [],                                                                                                                                                                              
-                [{:in, [context: EctoStore.BuildParams, import: Kernel],                                                                                                                                
-                  [{:q, [], EctoStore.BuildParams}, 
-                   {:query, [], EctoStore.BuildParams}]},                                                                                                                             
-                [where: {:==, [context: EctoStore.BuildParams, import: Kernel],                                                                                                                        
+                [{:in, [context: EctoStore, import: Kernel],                                                                                                                                
+                  [{:q, [], EctoStore}, 
+                   {:query, [], EctoStore}]},                                                                                                                             
+                [where: {:==, [context: EctoStore, import: Kernel],                                                                                                                        
                   [{{:., [], query}, [], []},                                                                                                                        
-                    {:^, [], [{:value, [], EctoStore.BuildParams}]}]}]]}]},                                                                                                                             
+                    {:^, [], [{:value, [], EctoStore}]}]}]]}]},                                                                                                                             
             {:build_query, [],                                                                                                                                                                         
-              [{:query, [], EctoStore.BuildParams},                                                                                                                                                     
-              {:|>, [context: EctoStore.BuildParams, import: Kernel],                                                                                                                                  
-                [{:filters, [], EctoStore.BuildParams},                                                                                                                                                 
+              [{:query, [], EctoStore},                                                                                                                                                     
+              {:|>, [context: EctoStore, import: Kernel],                                                                                                                                  
+                [{:filters, [], EctoStore},                                                                                                                                                 
                 {{:., [],                                                                                                                                                                              
                   [{:__aliases__, [alias: false], [:EctoStore, :Utils]},                                                                                                                               
                     :remove_from_map]}, [], [key]}]}]}]}]]}
@@ -55,17 +55,24 @@ defmodule EctoStore.BuildParams do
       quote do
         defp build_query(query, %{} = filters) do
           if Enum.empty? filters do
-            query
+            {:ok, query}
           else
             {:error, "Invalid fields for #{unquote(schema)} #{inspect filters}"}
           end
         end
 
-        def build_query(filters) do
+        def build_query(filters \\ %{}) do
           build_query unquote(schema), filters
+        end
+
+        def build_query!(filters \\ %{}) do
+          case build_query(unquote(schema), filters) do
+            {:error, reason} -> throw reason
+            {:ok, query} -> query
+          end
         end
       end
 
     Enum.concat functions, [final_function]
-  end
-end
+  end  
+end 
