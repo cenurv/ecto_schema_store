@@ -10,10 +10,11 @@ defmodule EctoStore do
       require EctoStore.BuildQueries
       require EctoStore.Edit
       import EctoStore.Alias
-      import Ecto.Query
+      import Ecto.Query, except: [update: 3]
       alias unquote(repo), as: Repo
 
       def schema, do: unquote(schema)
+      def repo, do: unquote(repo)
 
       EctoStore.Alias.build
       EctoStore.BuildQueries.build(unquote(schema))
