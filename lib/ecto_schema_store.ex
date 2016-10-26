@@ -36,9 +36,7 @@ defmodule EctoSchemaStore do
   The following functions are provided in a store for retrieving data.
 
   * `all`         - Fetch all records
-  * `fetch`       - Fetch all records (alias for all)
   * `one`         - Return a single record
-  * `get`         - Fetch a single record by id
 
   Sample Queries:
 
@@ -54,7 +52,7 @@ defmodule EctoSchemaStore do
   PersonStore.one %{name: "Bob"}
 
   # Return a specific record by id.
-  PersonStore.get 12
+  PersonStore.one 12
   ```
 
   ## Editing ##
@@ -66,6 +64,7 @@ defmodule EctoSchemaStore do
   * `update`       - Update a record based upon supplied parameters map.
   * `update!`      - Same as `update` but throws an error instead of returning a tuple.
   * `delete`       - Delete a record.
+  * `delete!`      - Same as `delete` but throws an error instead of returning a tuple.
 
   Sample Usage:
 

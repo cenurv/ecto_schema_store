@@ -15,10 +15,8 @@ defmodule EctoSchemaStore.Fetch do
           {:ok, query} -> unquote(repo).all query
         end
       end
-      
-      def fetch(%Ecto.Query{} = query), do: all query
-      def fetch(%{} = filters), do: all filters
 
+      def one(id) when is_integer(id) and id > 0, do: one %{id: id}
       def one(%Ecto.Query{} = query), do: unquote(repo).one query
       def one(%{} = filters) do
         case build_query(filters) do
@@ -26,8 +24,6 @@ defmodule EctoSchemaStore.Fetch do
           {:ok, query} -> unquote(repo).one query
         end
       end
-
-      def get(id) when is_integer(id) and id > 0, do: one %{id: id}
     end
   end
 end

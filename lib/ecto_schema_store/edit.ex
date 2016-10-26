@@ -57,6 +57,13 @@ defmodule EctoSchemaStore.Edit do
         repo = unquote(repo)
         repo.delete model
       end
+
+      def delete!(model_or_id) do
+        case delete model_or_id do
+          {:error, reason} -> throw reason
+          {:ok, result} -> result
+        end
+      end
     end
   end
 end
