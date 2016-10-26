@@ -1,4 +1,6 @@
 defmodule EctoSchemaStore.BuildQueries do
+  @moduledoc false
+
   defmacro build(schema) do
     keys = EctoSchemaStore.Utils.keys(Macro.expand(schema, __CALLER__))
 

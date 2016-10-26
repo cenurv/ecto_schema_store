@@ -1,4 +1,6 @@
 defmodule EctoSchemaStore.Edit do
+  @moduledoc false
+
   defmacro build(schema, repo) do
     quote do
       def insert(params, changeset \\ :changeset) do

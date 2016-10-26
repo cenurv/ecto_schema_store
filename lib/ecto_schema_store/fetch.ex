@@ -1,4 +1,6 @@
 defmodule EctoSchemaStore.Fetch do
+  @moduledoc false
+
   defmacro build(repo) do
     quote do
       def all do
