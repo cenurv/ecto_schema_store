@@ -1,4 +1,4 @@
-defmodule EctoStore.Alias do
+defmodule EctoSchemaStore.Alias do
   defmacro build do
     quote do
       defp alias_filters(filters), do: filters
