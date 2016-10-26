@@ -136,7 +136,6 @@ end
 Sometimes field names get changed or the developer wishes to have an alias that represents another field.
 These work for both querying and editing schema models.
 
-```
 ```elixir
 defmodule PersonStore do
   use EctoSchemaStore, schema: Person, repo: MyApp.Repo
@@ -146,5 +145,4 @@ end
 
 PersonStore.all %{email_address: "bob@nowhere.test"}
 PersonStore.update! 12, %{email_address: "bob@nowhere.test"}
-```
 ```
