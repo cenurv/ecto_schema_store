@@ -59,13 +59,13 @@ PersonStore.one 12
 The following functions are provided in a store for editing data.
 
 * `insert`              - Insert a record based upon supplied parameters map.
-* `trusted_insert`      - Insert the record without using a changeset. Intended only for trusted controlled data.
+* `trusted_insert`      - Insert the record without using a changeset.
 * `insert!`             - Same as `insert` but throws an error instead of returning a tuple.
-* `trusted_insert!`     - Insert the record without using a changeset. Intended only for trusted controlled data.
+* `trusted_insert!`     - Insert the record without using a changeset.
 * `update`              - Update a record based upon supplied parameters map.
-* `trusted_update`      - Update the record without using a changeset. Intended only for trusted controlled data.
+* `trusted_update`      - Update the record without using a changeset.
 * `update!`             - Same as `update` but throws an error instead of returning a tuple.
-* `trusted_update!`     - Update the record without using a changeset. Intended only for trusted controlled data.
+* `trusted_update!`     - Update the record without using a changeset.
 * `delete`              - Delete a record.
 * `delete!`             - Same as `delete` but throws an error instead of returning a tuple.
 
@@ -168,7 +168,7 @@ PersonStore.insert! %{"name" => "Bob", email: "bob2@nowhere.test"}
 
 ## Edit Events ##
 
-A store supports the concept of an event after and aedit action is successful in the Ecto repo.
+A store supports the concept of an event after and an edit action is successful in the Ecto repo.
 
 Events:
 
