@@ -59,12 +59,16 @@ defmodule EctoSchemaStore do
 
   The following functions are provided in a store for editing data.
 
-  * `insert`       - Insert a record based upon supplied parameters map.
-  * `insert!`      - Same as `insert` but throws an error instead of returning a tuple.
-  * `update`       - Update a record based upon supplied parameters map.
-  * `update!`      - Same as `update` but throws an error instead of returning a tuple.
-  * `delete`       - Delete a record.
-  * `delete!`      - Same as `delete` but throws an error instead of returning a tuple.
+  * `insert`              - Insert a record based upon supplied parameters map.
+  * `trusted_insert`      - Insert the record without using a changeset. Intended only for trusted controlled data.
+  * `insert!`             - Same as `insert` but throws an error instead of returning a tuple.
+  * `trusted_insert!`     - Insert the record without using a changeset. Intended only for trusted controlled data.
+  * `update`              - Update a record based upon supplied parameters map.
+  * `trusted_update`      - Update the record without using a changeset. Intended only for trusted controlled data.
+  * `update!`             - Same as `update` but throws an error instead of returning a tuple.
+  * `trusted_update!`     - Update the record without using a changeset. Intended only for trusted controlled data.
+  * `delete`              - Delete a record.
+  * `delete!`             - Same as `delete` but throws an error instead of returning a tuple.
 
   Sample Usage:
 

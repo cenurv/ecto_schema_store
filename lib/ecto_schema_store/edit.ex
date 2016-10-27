@@ -15,8 +15,22 @@ defmodule EctoSchemaStore.Edit do
         repo = unquote(repo)
         params = alias_filters(params)
 
-        change = apply(unquote(schema), changeset, [default_value, params])
+        change = 
+          if changeset do
+            apply(unquote(schema), changeset, [default_value, params])
+          else
+            Ecto.Changeset.change(default_value, params)
+          end
+
         repo.insert change
+      end
+
+      def trusted_insert(params, opts \\ []) do
+        opts =
+          Keyword.merge(default_edit_options, opts)
+          |> Keyword.merge([changeset: nil])
+
+        insert params, opts
       end
 
       def insert!(params, opts \\ []) do
@@ -24,6 +38,14 @@ defmodule EctoSchemaStore.Edit do
           {:error, reason} -> throw reason
           {:ok, result} -> result
         end
+      end
+
+      def trusted_insert!(params, opts \\ []) do
+        opts =
+          Keyword.merge(default_edit_options, opts)
+          |> Keyword.merge([changeset: nil])
+
+        insert! params, opts
       end
 
       def update(id_or_model, params, opts \\ [])
@@ -34,7 +56,13 @@ defmodule EctoSchemaStore.Edit do
         repo = unquote(repo)
         default_value = struct unquote(schema), %{id: id}
         params = alias_filters(params)
-        change = apply(unquote(schema), changeset, [default_value, params])
+        change = 
+          if changeset do
+            apply(unquote(schema), changeset, [default_value, params])
+          else
+            Ecto.Changeset.change(default_value, params)
+          end
+
         repo.update change
       end
       def update(model, params, opts) do
@@ -44,8 +72,22 @@ defmodule EctoSchemaStore.Edit do
         repo = unquote(repo)
         params = alias_filters(params)
 
-        change = apply(unquote(schema), changeset, [model, params])
+        change = 
+          if changeset do
+            apply(unquote(schema), changeset, [model, params])
+          else
+            Ecto.Changeset.change(model, params)
+          end
+
         repo.update change
+      end
+
+      def trusted_update(id_or_model, params, opts \\ []) do
+        opts =
+          Keyword.merge(default_edit_options, opts)
+          |> Keyword.merge([changeset: nil])
+
+        update id_or_model, params, opts
       end
 
       def update!(id_or_model, params, opts \\ [])
@@ -60,6 +102,14 @@ defmodule EctoSchemaStore.Edit do
           {:error, reason} -> throw reason
           {:ok, result} -> result
         end
+      end
+
+      def trusted_update!(id_or_model, params, opts \\ []) do
+        opts =
+          Keyword.merge(default_edit_options, opts)
+          |> Keyword.merge([changeset: nil])
+
+        update! id_or_model, params, opts
       end
 
       def delete(id) when is_integer id do
