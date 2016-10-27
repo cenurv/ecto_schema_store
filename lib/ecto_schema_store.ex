@@ -166,6 +166,30 @@ defmodule EctoSchemaStore do
   ```elixir
   PersonStore.insert! %{"name" => "Bob", email: "bob2@nowhere.test"}
   ```
+
+  ## Edit Events ##
+
+  A store supports the concept of an event after and aedit action is successful in the Ecto repo.
+
+  Events:
+
+  * `:after_insert`
+  * `:after_update`
+  * `:after_delete`
+
+  ```elixir
+  defmodule PersonStore do
+    use EctoSchemaStore, schema: Person, repo: MyApp.Repo
+
+    on(:after_delete, model) do
+      IO.inspect "Delete \#{schema} id: \#{model.id}"
+    end
+
+    on([:after_insert, :after_update], model) do
+      IO.inspect "Changed \#{schema} id: \#{model.id}"
+    end
+  end
+  ```
   """
 
   defmacro __using__(opts) do
@@ -177,6 +201,8 @@ defmodule EctoSchemaStore do
       require EctoSchemaStore.Fetch
       require EctoSchemaStore.BuildQueries
       require EctoSchemaStore.Edit
+      require EctoSchemaStore.Event
+      import EctoSchemaStore.Event, only: [on: 3]
       import EctoSchemaStore.Alias
       import Ecto.Query, except: [update: 3]
       alias unquote(repo), as: Repo
@@ -184,6 +210,7 @@ defmodule EctoSchemaStore do
       def schema, do: unquote(schema)
       def repo, do: unquote(repo)
 
+      EctoSchemaStore.Event.build
       EctoSchemaStore.Alias.build
       EctoSchemaStore.BuildQueries.build(unquote(schema))
       EctoSchemaStore.Fetch.build(unquote(repo))

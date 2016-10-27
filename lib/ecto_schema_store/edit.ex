@@ -22,7 +22,12 @@ defmodule EctoSchemaStore.Edit do
             Ecto.Changeset.change(default_value, params)
           end
 
-        repo.insert change
+        case repo.insert change do
+          {:error, _} = error -> error
+          {:ok, model} = result ->
+            on_after_insert(model)
+            {:ok, model}
+        end
       end
 
       def trusted_insert(params, opts \\ []) do
@@ -48,29 +53,19 @@ defmodule EctoSchemaStore.Edit do
         insert! params, opts
       end
 
-      def update(id_or_model, params, opts \\ [])
-      def update(id, params, opts) when is_integer id do
+      def update(id_or_model, params, opts \\ []) do
         opts = Keyword.merge default_edit_options, opts
         changeset = Keyword.get opts, :changeset
 
         repo = unquote(repo)
-        default_value = struct unquote(schema), %{id: id}
         params = alias_filters(params)
-        change = 
-          if changeset do
-            apply(unquote(schema), changeset, [default_value, params])
+
+        model =
+          if is_integer id_or_model do
+            struct unquote(schema), %{id: id_or_model}
           else
-            Ecto.Changeset.change(default_value, params)
+            id_or_model
           end
-
-        repo.update change
-      end
-      def update(model, params, opts) do
-        opts = Keyword.merge default_edit_options, opts
-        changeset = Keyword.get opts, :changeset
-
-        repo = unquote(repo)
-        params = alias_filters(params)
 
         change = 
           if changeset do
@@ -79,7 +74,12 @@ defmodule EctoSchemaStore.Edit do
             Ecto.Changeset.change(model, params)
           end
 
-        repo.update change
+        case repo.update change do
+          {:error, _} = error -> error
+          {:ok, model} = result ->
+            on_after_update(model)
+            {:ok, model}
+        end
       end
 
       def trusted_update(id_or_model, params, opts \\ []) do
@@ -90,15 +90,8 @@ defmodule EctoSchemaStore.Edit do
         update id_or_model, params, opts
       end
 
-      def update!(id_or_model, params, opts \\ [])
-      def update!(id, params, opts) when is_integer id do
-        case update id, params, opts do
-          {:error, reason} -> throw reason
-          {:ok, result} -> result
-        end
-      end
-      def update!(model, params, opts) do
-        case update model, params, opts do
+      def update!(id_or_model, params, opts \\ []) do
+        case update id_or_model, params, opts do
           {:error, reason} -> throw reason
           {:ok, result} -> result
         end
@@ -112,15 +105,22 @@ defmodule EctoSchemaStore.Edit do
         update! id_or_model, params, opts
       end
 
-      def delete(id) when is_integer id do
+      def delete(id_or_model) do
         repo = unquote(repo)
-        default_value = struct unquote(schema), %{id: id}
+  
+        model =
+          if is_integer id_or_model do
+            struct unquote(schema), %{id: id_or_model}
+          else
+            id_or_model
+          end
 
-        repo.delete default_value
-      end
-      def delete(model) do
-        repo = unquote(repo)
-        repo.delete model
+        case repo.delete model do
+          {:error, _} = error -> error
+          {:ok, model} = result ->
+            on_after_delete(model)
+            {:ok, model}
+        end
       end
 
       def delete!(model_or_id) do

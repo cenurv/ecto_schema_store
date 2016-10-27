@@ -5,12 +5,6 @@ defmodule EctoSchemaStore.Alias do
     quote do
       defp alias_filters(filters), do: generalize_keys(filters)
 
-      defoverridable [alias_filters: 1]
-    end
-  end
-
-  defmacro alias_fields(keywords) do
-    quote do
       defp generalize_keys(entries) when is_list entries do
         for entry <- entries do
           generalize_keys entry
@@ -33,6 +27,12 @@ defmodule EctoSchemaStore.Alias do
       end
       defp generalize_keys(value), do: value
 
+      defoverridable [alias_filters: 1]
+    end
+  end
+
+  defmacro alias_fields(keywords) do
+    quote do
       defp alias_filters(filters) do
         filters = generalize_keys(filters)
         aliases = unquote(keywords)

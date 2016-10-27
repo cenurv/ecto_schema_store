@@ -165,3 +165,27 @@ only one will be used.
 ```elixir
 PersonStore.insert! %{"name" => "Bob", email: "bob2@nowhere.test"}
 ```
+
+## Edit Events ##
+
+A store supports the concept of an event after and aedit action is successful in the Ecto repo.
+
+Events:
+
+* `:after_insert`
+* `:after_update`
+* `:after_delete`
+
+```elixir
+defmodule PersonStore do
+  use EctoSchemaStore, schema: Person, repo: MyApp.Repo
+
+  on(:after_delete, model) do
+    IO.inspect "Delete #{schema} id: #{model.id}"
+  end
+
+  on([:after_insert, :after_update], model) do
+    IO.inspect "Changed #{schema} id: #{model.id}"
+  end
+end
+```
