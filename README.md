@@ -59,13 +59,13 @@ PersonStore.one 12
 The following functions are provided in a store for editing data.
 
 * `insert`              - Insert a record based upon supplied parameters map.
-* `trusted_insert`      - Insert the record without using a changeset.
+* `insert_fields`       - Insert the record without using a changeset.
 * `insert!`             - Same as `insert` but throws an error instead of returning a tuple.
-* `trusted_insert!`     - Insert the record without using a changeset.
+* `insert_fields!`      - Same as `insert_fields` but throws an error instead of returning a tuple.
 * `update`              - Update a record based upon supplied parameters map.
-* `trusted_update`      - Update the record without using a changeset.
+* `update_fields`       - Update the record without using a changeset.
 * `update!`             - Same as `update` but throws an error instead of returning a tuple.
-* `trusted_update!`     - Update the record without using a changeset.
+* `update_fields!`      - Same as `update_fields` but throws an error instead of returning a tuple.
 * `delete`              - Delete a record.
 * `delete!`             - Same as `delete` but throws an error instead of returning a tuple.
 

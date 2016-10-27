@@ -60,13 +60,13 @@ defmodule EctoSchemaStore do
   The following functions are provided in a store for editing data.
 
   * `insert`              - Insert a record based upon supplied parameters map.
-  * `trusted_insert`      - Insert the record without using a changeset.
+  * `insert_fields`       - Insert the record without using a changeset.
   * `insert!`             - Same as `insert` but throws an error instead of returning a tuple.
-  * `trusted_insert!`     - Insert the record without using a changeset.
+  * `insert_fields!`      - Same as `insert_fields` but throws an error instead of returning a tuple.
   * `update`              - Update a record based upon supplied parameters map.
-  * `trusted_update`      - Update the record without using a changeset.
+  * `update_fields`       - Update the record without using a changeset.
   * `update!`             - Same as `update` but throws an error instead of returning a tuple.
-  * `trusted_update!`     - Update the record without using a changeset.
+  * `update_fields!`      - Same as `update_fields` but throws an error instead of returning a tuple.
   * `delete`              - Delete a record.
   * `delete!`             - Same as `delete` but throws an error instead of returning a tuple.
 
@@ -159,7 +159,7 @@ defmodule EctoSchemaStore do
   on to Ecto. This means you can provide a mixture of both. This will allow a
   developer to combine multiple maps together and not worry about what kind of
   keys were used.
-  
+
   However, if you provide the same value twice as both an atom and string key then
   only one will be used.
 
@@ -207,13 +207,19 @@ defmodule EctoSchemaStore do
       import Ecto.Query, except: [update: 3]
       alias unquote(repo), as: Repo
 
+      @doc """
+      Returns a reference to the schema module `#{unquote(schema)}`.
+      """
       def schema, do: unquote(schema)
+      @doc """
+      Returns a reference to the Ecto Repo module `#{unquote(repo)}`.
+      """
       def repo, do: unquote(repo)
 
       EctoSchemaStore.Event.build
       EctoSchemaStore.Alias.build
       EctoSchemaStore.BuildQueries.build(unquote(schema))
-      EctoSchemaStore.Fetch.build(unquote(repo))
+      EctoSchemaStore.Fetch.build(unquote(schema), unquote(repo))
       EctoSchemaStore.Edit.build(unquote(schema), unquote(repo))
     end
   end

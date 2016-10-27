@@ -16,6 +16,32 @@ defmodule EctoSchemaStore.BuildQueries do
     #   end
     # )
 
+    getters =
+      for key <- keys do
+        get_name = String.to_atom "get_by_#{key}"
+        all_name = String.to_atom "get_all_by_#{key}"
+
+        quote do
+          @doc """
+          Fetch a single record by :#{unquote(key)} field.
+          """
+          def unquote(get_name)(value) do
+            %{}
+            |> Map.put(unquote(key), value)
+            |> one
+          end
+
+          @doc """
+          Fetch all records by :#{unquote(key)} field.
+          """
+          def unquote(all_name)(value) do
+            %{}
+            |> Map.put(unquote(key), value)
+            |> all
+          end
+        end
+      end
+
     functions =
       for key <- keys do
         param = Keyword.put([], key, {:value, [], EctoSchemaStore})
@@ -57,6 +83,11 @@ defmodule EctoSchemaStore.BuildQueries do
           end
         end
 
+        @doc """
+        Build an `Ecto.Query` from the provided fields and values map.
+
+        Available fields: `#{inspect unquote(keys)}`
+        """
         def build_query(filters \\ %{}) do
           build_query unquote(schema), alias_filters(filters)
         end
@@ -69,6 +100,8 @@ defmodule EctoSchemaStore.BuildQueries do
         end
       end
 
-    Enum.concat functions, [final_function]
+    getters
+    |> Enum.concat(functions)
+    |> Enum.concat([final_function])
   end  
-end 
+end

@@ -7,6 +7,13 @@ defmodule EctoSchemaStore.Edit do
         [changeset: :changeset]
       end
 
+      @doc """
+      Insert a record into `#{unquote(schema)}` via `#{unquote(repo)}`.
+
+      Options:
+
+      * `:changeset`        - By default use :changeset on the schema otherwise use the provided changeset name.
+      """
       def insert(params, opts \\ []) do
         opts = Keyword.merge default_edit_options, opts
         changeset = Keyword.get opts, :changeset
@@ -30,7 +37,10 @@ defmodule EctoSchemaStore.Edit do
         end
       end
 
-      def trusted_insert(params, opts \\ []) do
+      @doc """
+      Insert a record into `#{unquote(schema)}` via `#{unquote(repo)}`. Sets the change directly and does not use a changeset.
+      """
+      def insert_fields(params, opts \\ []) do
         opts =
           Keyword.merge(default_edit_options, opts)
           |> Keyword.merge([changeset: nil])
@@ -38,6 +48,9 @@ defmodule EctoSchemaStore.Edit do
         insert params, opts
       end
 
+      @doc """
+      Like `insert` but throws and error instead of returning a tuple.
+      """
       def insert!(params, opts \\ []) do
         case insert params, opts do
           {:error, reason} -> throw reason
@@ -45,7 +58,10 @@ defmodule EctoSchemaStore.Edit do
         end
       end
 
-      def trusted_insert!(params, opts \\ []) do
+      @doc """
+      Like `insert_fields` but throws and error instead of returning a tuple.
+      """
+      def insert_fields!(params, opts \\ []) do
         opts =
           Keyword.merge(default_edit_options, opts)
           |> Keyword.merge([changeset: nil])
@@ -53,6 +69,13 @@ defmodule EctoSchemaStore.Edit do
         insert! params, opts
       end
 
+      @doc """
+      Updates a record in `#{unquote(schema)}` via `#{unquote(repo)}`.
+
+      Options:
+
+      * `:changeset`        - By default use :changeset on the schema otherwise use the provided changeset name.
+      """
       def update(id_or_model, params, opts \\ []) do
         opts = Keyword.merge default_edit_options, opts
         changeset = Keyword.get opts, :changeset
@@ -82,7 +105,10 @@ defmodule EctoSchemaStore.Edit do
         end
       end
 
-      def trusted_update(id_or_model, params, opts \\ []) do
+      @doc """
+      Updates a record in `#{unquote(schema)}` via `#{unquote(repo)}`. Sets the change directly and does not use a changeset.
+      """
+      def update_fields(id_or_model, params, opts \\ []) do
         opts =
           Keyword.merge(default_edit_options, opts)
           |> Keyword.merge([changeset: nil])
@@ -90,6 +116,9 @@ defmodule EctoSchemaStore.Edit do
         update id_or_model, params, opts
       end
 
+      @doc """
+      Like `update` but throws and error instead of returning a tuple.
+      """
       def update!(id_or_model, params, opts \\ []) do
         case update id_or_model, params, opts do
           {:error, reason} -> throw reason
@@ -97,7 +126,10 @@ defmodule EctoSchemaStore.Edit do
         end
       end
 
-      def trusted_update!(id_or_model, params, opts \\ []) do
+      @doc """
+      Like `update_fields` but throws and error instead of returning a tuple.
+      """
+      def update_fields!(id_or_model, params, opts \\ []) do
         opts =
           Keyword.merge(default_edit_options, opts)
           |> Keyword.merge([changeset: nil])
@@ -105,6 +137,9 @@ defmodule EctoSchemaStore.Edit do
         update! id_or_model, params, opts
       end
 
+      @doc """
+      Deletes a record in `#{unquote(schema)}` via `#{unquote(repo)}`.
+      """
       def delete(id_or_model) do
         repo = unquote(repo)
   
@@ -123,6 +158,9 @@ defmodule EctoSchemaStore.Edit do
         end
       end
 
+      @doc """
+      Like `delete` but throws and error instead of returning a tuple.
+      """
       def delete!(model_or_id) do
         case delete model_or_id do
           {:error, reason} -> throw reason
