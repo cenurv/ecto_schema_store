@@ -168,7 +168,7 @@ PersonStore.insert! %{"name" => "Bob", email: "bob2@nowhere.test"}
 
 ## Edit Events ##
 
-A store supports the concept of an event after and an edit action is successful in the Ecto repo.
+A store supports the concept of an event after an edit action is successful in the Ecto repo.
 
 Events:
 
