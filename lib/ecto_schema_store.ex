@@ -84,9 +84,9 @@ defmodule EctoSchemaStore do
   This can be overridden and a specific changeset name provided.
 
   ```elixir
-  bob = PersonStore.insert! %{name: "Bob", email: "bob@nowhere.test"}, :insert_changeset
-  bob = PersonStore.update! bob, %{email: "bob2@nowhere.test"}, :update_changeset
-  bob = PersonStore.update! bob, %{email: "bob2@nowhere.test"}, :my_other_custom_changeset
+  bob = PersonStore.insert! %{name: "Bob", email: "bob@nowhere.test"}, changeset: :insert_changeset
+  bob = PersonStore.update! bob, %{email: "bob2@nowhere.test"}, changeset: :update_changeset
+  bob = PersonStore.update! bob, %{email: "bob2@nowhere.test"}, changeset: :my_other_custom_changeset
   ``` 
 
   ## References ##
@@ -145,6 +145,22 @@ defmodule EctoSchemaStore do
 
   PersonStore.all %{email_address: "bob@nowhere.test"}
   PersonStore.update! 12, %{email_address: "bob@nowhere.test"}
+  ```
+
+  ## Filter or Params Map ##
+
+  Many of the API calls used by a store take a map of fields as input. Normal Ecto
+  requires param maps to be either all atom or string keyed but not mixed. A schema
+  store will convert every map provided into atom keys before aliasing and passing
+  on to Ecto. This means you can provide a mixture of both. This will allow a
+  developer to combine multiple maps together and not worry about what kind of
+  keys were used.
+  
+  However, if you provide the same value twice as both an atom and string key then
+  only one will be used.
+
+  ```elixir
+  PersonStore.insert! %{"name" => "Bob", email: "bob2@nowhere.test"}
   ```
   """
 
