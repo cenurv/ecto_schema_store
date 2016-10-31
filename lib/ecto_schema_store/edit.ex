@@ -14,7 +14,11 @@ defmodule EctoSchemaStore.Edit do
 
       * `:changeset`        - By default use :changeset on the schema otherwise use the provided changeset name.
       """
-      def insert(params, opts \\ []) do
+      def insert(params \\ %{}, opts \\ [])
+      def insert(params, opts) when is_list params do
+        insert Enum.into(params, %{}), opts
+      end
+      def insert(params, opts) do
         opts = Keyword.merge default_edit_options, opts
         changeset = Keyword.get opts, :changeset
 
@@ -76,7 +80,11 @@ defmodule EctoSchemaStore.Edit do
 
       * `:changeset`        - By default use :changeset on the schema otherwise use the provided changeset name.
       """
-      def update(id_or_model, params, opts \\ []) do
+      def update(id_or_model, params, opts \\ [])
+      def update(id_or_model, params, opts) when is_list params do
+        update id_or_model, Enum.into(params, %{}), opts
+      end
+      def update(id_or_model, params, opts) do
         opts = Keyword.merge default_edit_options, opts
         changeset = Keyword.get opts, :changeset
 

@@ -17,7 +17,7 @@ defmodule EctoSchemaStore.Fetch do
       Fetch all records from `#{unquote(schema)}` filtered by provided fields map.
       """
       def all(%Ecto.Query{} = query), do: unquote(repo).all query
-      def all(%{} = filters) do
+      def all(filters) do
         case build_query(filters) do
           {:error, _} = error -> error
           {:ok, query} -> unquote(repo).all query
@@ -29,7 +29,7 @@ defmodule EctoSchemaStore.Fetch do
       """
       def one(id) when is_integer(id) and id > 0, do: one %{id: id}
       def one(%Ecto.Query{} = query), do: unquote(repo).one query
-      def one(%{} = filters) do
+      def one(filters) do
         case build_query(filters) do
           {:error, _} = error -> error
           {:ok, query} -> unquote(repo).one query

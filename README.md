@@ -46,9 +46,11 @@ PersonStore.all
 # Get all records fields that match the provided value.
 PersonStore.all %{name: "Bob"}
 PersonStore.all %{name: "Bob", email: "bob@nowhere.test"}
+PersonStore.all name: "Bob", email: "bob@nowhere.test"
 
 # Return a single record.
 PersonStore.one %{name: "Bob"}
+PersonStore.one name: "Bob"
 
 # Return a specific record by id.
 PersonStore.one 12
@@ -72,9 +74,14 @@ The following functions are provided in a store for editing data.
 Sample Usage:
 
 ```elixir
+# Using Map
 bob = PersonStore.insert! %{name: "Bob", email: "bob@nowhere.test"}
 bob = PersonStore.update! bob, %{email: "bob2@nowhere.test"}
 PersonStore.delete bob
+
+# Using Keyword List
+bob = PersonStore.insert! name: "Bob", email: "bob@nowhere.test"
+bob = PersonStore.update! bob, email: "bob2@nowhere.test"
 
 # Updates/deletes can also occur by id.
 PersonStore.update! 12, %{email: "bob2@nowhere.test"}
@@ -88,7 +95,9 @@ This can be overridden and a specific changeset name provided.
 
 ```elixir
 bob = PersonStore.insert! %{name: "Bob", email: "bob@nowhere.test"}, changeset: :insert_changeset
+bob = PersonStore.insert! [name: "Bob", email: "bob@nowhere.test"], changeset: :insert_changeset
 bob = PersonStore.update! bob, %{email: "bob2@nowhere.test"}, changeset: :update_changeset
+bob = PersonStore.update! bob, [email: "bob2@nowhere.test"], changeset: :update_changeset
 bob = PersonStore.update! bob, %{email: "bob2@nowhere.test"}, changeset: :my_other_custom_changeset
 ``` 
 
@@ -150,7 +159,7 @@ PersonStore.all %{email_address: "bob@nowhere.test"}
 PersonStore.update! 12, %{email_address: "bob@nowhere.test"}
 ```
 
-## Filter or Params Map ##
+## Filter or Params Map/Keyword List ##
 
 Many of the API calls used by a store take a map of fields as input. Normal Ecto
 requires param maps to be either all atom or string keyed but not mixed. A schema
@@ -164,6 +173,28 @@ only one will be used.
 
 ```elixir
 PersonStore.insert! %{"name" => "Bob", email: "bob2@nowhere.test"}
+```
+
+## Lexical Atom Query ##
+
+The store provides a function for taking a lexical query atom with a list of values and
+returning the results. Currently only supports `_and_` clauses.
+
+Functions:
+
+* `get_all_by`              - Return all results. Equivalent to using the `all` function.
+* `get_by`                  - Return a single result. Equivalent to using the `one` function.
+
+```elixir
+# Regular
+PersonStore.all %{name: "Bob", email: "bob@nowhere.test"}
+# Lexical Atom
+PersonStore.get_all_by :name_and_email, ["Bob", "bob@nowhere.test"]
+
+# Regular
+PersonStore.one %{name: "Bob", email: "bob@nowhere.test"}
+# Lexical Atom
+PersonStore.get_by :name_and_email, ["Bob", "bob@nowhere.test"]
 ```
 
 ## Edit Events ##
