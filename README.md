@@ -56,6 +56,30 @@ PersonStore.one name: "Bob"
 PersonStore.one 12
 ```
 
+## Filter Operators ##
+
+Stores support a special syntax for changing the comparison operator in the passed filter map or keyword list.
+
+Operators:
+
+* `{:==, value}`            - The field equals this value. This is the default operator when the value is not `nil`.
+* `{:!=, value}`            - The field does not equal the value.
+* `{:==, nil}`              - The field is `nil` or `null` in the database. This is the default operator when the value is `nil`.
+* `{:!=, nil}`              - The field is not `nil` or `null` in the database.
+* `{:<, value}`             - The field is less than the value.
+* `{:<=, value}`            - The field is less than or equal the value.
+* `{:>, value}`             - The field is greater than the value.
+* `{:>=, value}`            - The field is greater than or equal the value.
+* `{:in, []}`               - the field is in the list of provided values.
+
+```elixir
+PersonStore.all %{name: nil}
+PersonStore.all %{name: {:==, nil}}
+PersonStore.all name: {:!=, nil}
+PersonStore.all name: {:!=, "Bob"}
+PersonStore.all name: {:in, ["Bob"]}, email: "bob@nowhere.test"
+```
+
 ## Editing ##
 
 The following functions are provided in a store for editing data.

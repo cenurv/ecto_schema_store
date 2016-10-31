@@ -1,20 +1,82 @@
 defmodule EctoSchemaStore.BuildQueries do
   @moduledoc false
 
+  defmacro build_ecto_query(query, :is_nil, key) do
+    key = Code.string_to_quoted! "q.#{key}"
+
+    quote do
+      from q in unquote(query),
+      where: is_nil(unquote(key))
+    end
+  end
+  defmacro build_ecto_query(query, :not_nil, key) do
+    key = Code.string_to_quoted! "q.#{key}"
+
+    quote do
+      from q in unquote(query),
+      where: not is_nil(unquote(key))
+    end
+  end
+
+  defmacro build_ecto_query(query, :eq, key, value) do
+    key = Code.string_to_quoted! "q.#{key}"
+
+    quote do
+      from q in unquote(query),
+      where: unquote(key) == unquote(value)
+    end
+  end
+  defmacro build_ecto_query(query, :not, key, value) do
+    key = Code.string_to_quoted! "q.#{key}"
+
+    quote do
+      from q in unquote(query),
+      where: unquote(key) != unquote(value)
+    end
+  end
+  defmacro build_ecto_query(query, :lt, key, value) do
+    key = Code.string_to_quoted! "q.#{key}"
+
+    quote do
+      from q in unquote(query),
+      where: unquote(key) < unquote(value)
+    end
+  end
+  defmacro build_ecto_query(query, :lte, key, value) do
+    key = Code.string_to_quoted! "q.#{key}"
+
+    quote do
+      from q in unquote(query),
+      where: unquote(key) <= unquote(value)
+    end
+  end
+  defmacro build_ecto_query(query, :gt, key, value) do
+    key = Code.string_to_quoted! "q.#{key}"
+
+    quote do
+      from q in unquote(query),
+      where: unquote(key) > unquote(value)
+    end
+  end
+  defmacro build_ecto_query(query, :gte, key, value) do
+    key = Code.string_to_quoted! "q.#{key}"
+
+    quote do
+      from q in unquote(query),
+      where: unquote(key) >= unquote(value)
+    end
+  end
+  defmacro build_ecto_query(query, :in, key, value) do
+    key = Code.string_to_quoted! "q.#{key}"
+
+    quote do
+      from q in unquote(query),
+      where: unquote(key) in unquote(value)
+    end
+  end
+
   defmacro build(schema) do
     keys = EctoSchemaStore.Utils.keys(Macro.expand(schema, __CALLER__))
-
-    # Save to generate AST in the future.
-    # IO.inspect(
-    #   quote do
-    #     defp build_query(query, %{key: value} = filters) do
-    #       query = from q in query,
-    #               where: q.key == ^value
-
-    #       build_query(query, filters |> EctoSchemaStore.Utils.remove_from_map(:key))
-    #     end
-    #   end
-    # )
 
     getters =
       quote do
@@ -68,33 +130,93 @@ defmodule EctoSchemaStore.BuildQueries do
 
     functions =
       for key <- keys do
-        param = Keyword.put([], key, {:value, [], EctoSchemaStore})
-        query = [{:q, [], EctoSchemaStore}, key]
+        map_entry = Code.string_to_quoted! "%{#{key}: _}"
+        eq_map_entry = Code.string_to_quoted! "%{#{key}: {:==, _}}"
+        not_map_entry = Code.string_to_quoted! "%{#{key}: {:!=, _}}"
+        is_nil_map_entry = Code.string_to_quoted! "%{#{key}: :nil}"
+        is_nil_atom_map_entry = Code.string_to_quoted! "%{#{key}: {:==, :nil}}"
+        is_not_nil_map_entry = Code.string_to_quoted! "%{#{key}: {:!=, :nil}}"
+        lt_map_entry = Code.string_to_quoted! "%{#{key}: {:<, _}}"
+        lte_map_entry = Code.string_to_quoted! "%{#{key}: {:<=, _}}"
+        gt_map_entry = Code.string_to_quoted! "%{#{key}: {:>, _}}"
+        gte_map_entry = Code.string_to_quoted! "%{#{key}: {:>=, _}}"
+        in_map_entry = Code.string_to_quoted! "%{#{key}: {:in, _}}"
 
-        {:defp, [context: EctoSchemaStore, import: Kernel],
-        [{:build_query, [context: EctoSchemaStore],
-          [{:query, [], EctoSchemaStore},
-            {:=, [],
-            [{:%{}, [], param},
-              {:filters, [], EctoSchemaStore}]}]},                                                                                                                                                
-          [do: {:__block__, [],                                                                                                                                                                         
-            [{:=, [],                                                                                                                                                                                   
-              [{:query, [], EctoSchemaStore},                                                                                                                                                     
-              {:from, [],                                                                                                                                                                              
-                [{:in, [context: EctoSchemaStore, import: Kernel],                                                                                                                                
-                  [{:q, [], EctoSchemaStore}, 
-                   {:query, [], EctoSchemaStore}]},                                                                                                                             
-                [where: {:==, [context: EctoSchemaStore, import: Kernel],                                                                                                                        
-                  [{{:., [], query}, [], []},                                                                                                                        
-                    {:^, [], [{:value, [], EctoSchemaStore}]}]}]]}]},                                                                                                                             
-            {:build_query, [],                                                                                                                                                                         
-              [{:query, [], EctoSchemaStore},                                                                                                                                                     
-              {:|>, [context: EctoSchemaStore, import: Kernel],                                                                                                                                  
-                [{:filters, [], EctoSchemaStore},                                                                                                                                                 
-                {{:., [],                                                                                                                                                                              
-                  [{:__aliases__, [alias: false], [:EctoSchemaStore, :Utils]},                                                                                                                               
-                    :remove_from_map]}, [], [key]}]}]}]}]]}
+        quote do
+          defp build_query(query, unquote(is_nil_map_entry) = filters) do
+            query = EctoSchemaStore.BuildQueries.build_ecto_query(query, :is_nil, unquote(key))
 
+            build_query(query, filters |> EctoSchemaStore.Utils.remove_from_map(unquote(key)))
+          end
+
+          defp build_query(query, unquote(is_nil_atom_map_entry) = filters) do
+            query = EctoSchemaStore.BuildQueries.build_ecto_query(query, :is_nil, unquote(key))
+
+            build_query(query, filters |> EctoSchemaStore.Utils.remove_from_map(unquote(key)))
+          end
+
+          defp build_query(query, unquote(is_not_nil_map_entry) = filters) do
+            query = EctoSchemaStore.BuildQueries.build_ecto_query(query, :not_nil, unquote(key))
+
+            build_query(query, filters |> EctoSchemaStore.Utils.remove_from_map(unquote(key)))
+          end
+
+          defp build_query(query, unquote(not_map_entry) = filters) do
+            value = elem(filters[unquote(key)], 1)
+            query = EctoSchemaStore.BuildQueries.build_ecto_query(query, :not, unquote(key), ^value)
+
+            build_query(query, filters |> EctoSchemaStore.Utils.remove_from_map(unquote(key)))
+          end
+
+          defp build_query(query, unquote(lt_map_entry) = filters) do
+            value = elem(filters[unquote(key)], 1)
+            query = EctoSchemaStore.BuildQueries.build_ecto_query(query, :lt, unquote(key), ^value)
+
+            build_query(query, filters |> EctoSchemaStore.Utils.remove_from_map(unquote(key)))
+          end
+
+          defp build_query(query, unquote(lte_map_entry) = filters) do
+            value = elem(filters[unquote(key)], 1)
+            query = EctoSchemaStore.BuildQueries.build_ecto_query(query, :lte, unquote(key), ^value)
+
+            build_query(query, filters |> EctoSchemaStore.Utils.remove_from_map(unquote(key)))
+          end
+
+          defp build_query(query, unquote(gt_map_entry) = filters) do
+            value = elem(filters[unquote(key)], 1)
+            query = EctoSchemaStore.BuildQueries.build_ecto_query(query, :gt, unquote(key), ^value)
+
+            build_query(query, filters |> EctoSchemaStore.Utils.remove_from_map(unquote(key)))
+          end
+
+          defp build_query(query, unquote(gte_map_entry) = filters) do
+            value = elem(filters[unquote(key)], 1)
+            query = EctoSchemaStore.BuildQueries.build_ecto_query(query, :gte, unquote(key), ^value)
+
+            build_query(query, filters |> EctoSchemaStore.Utils.remove_from_map(unquote(key)))
+          end
+
+          defp build_query(query, unquote(in_map_entry) = filters) do
+            value = elem(filters[unquote(key)], 1)
+            query = EctoSchemaStore.BuildQueries.build_ecto_query(query, :in, unquote(key), ^value)
+
+            build_query(query, filters |> EctoSchemaStore.Utils.remove_from_map(unquote(key)))
+          end
+
+          defp build_query(query, unquote(eq_map_entry) = filters) do
+            value = elem(filters[unquote(key)], 1)
+            query = EctoSchemaStore.BuildQueries.build_ecto_query(query, :eq, unquote(key), ^value)
+
+            build_query(query, filters |> EctoSchemaStore.Utils.remove_from_map(unquote(key)))
+          end
+
+          defp build_query(query, unquote(map_entry) = filters) do
+            value = filters[unquote(key)]
+            query = EctoSchemaStore.BuildQueries.build_ecto_query(query, :eq, unquote(key), ^value)
+
+            build_query(query, filters |> EctoSchemaStore.Utils.remove_from_map(unquote(key)))
+          end
+        end
       end
     
     final_function =
