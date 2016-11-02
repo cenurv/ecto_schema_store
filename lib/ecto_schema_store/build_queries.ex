@@ -221,7 +221,7 @@ defmodule EctoSchemaStore.BuildQueries do
     
     final_function =
       quote do
-        def schema_keys, do: unquote(keys)
+        def schema_fields, do: unquote(keys)
 
         defp build_query(query, %{} = filters) do
           if Enum.empty? filters do
