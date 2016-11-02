@@ -76,7 +76,8 @@ defmodule EctoSchemaStore.BuildQueries do
   end
 
   defmacro build(schema) do
-    keys = EctoSchemaStore.Utils.keys(Macro.expand(schema, __CALLER__))
+    keys = EctoSchemaStore.Utils.keys(Macro.expand(schema, __CALLER__), false)
+    assocs = EctoSchemaStore.Utils.keys(Macro.expand(schema, __CALLER__), true)
 
     getters =
       quote do
@@ -222,6 +223,7 @@ defmodule EctoSchemaStore.BuildQueries do
     final_function =
       quote do
         def schema_fields, do: unquote(keys)
+        def schema_associations, do: unquote(assocs)
 
         defp build_query(query, %{} = filters) do
           if Enum.empty? filters do

@@ -19,7 +19,7 @@ defmodule EctoSchemaStore.Alias do
             end
 
           cond do
-            is_map(value) -> {key, generalize_keys(value)}
+            is_map(value) and not Map.has_key?(value, :__struct__) -> {key, generalize_keys(value)}
             is_list(value) -> {key, generalize_keys(value)}
             true -> {key, value}
           end
