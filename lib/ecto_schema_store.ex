@@ -126,6 +126,18 @@ defmodule EctoSchemaStore do
   bob = PersonStore.update! bob, %{email: "bob2@nowhere.test"}, changeset: :my_other_custom_changeset
   ``` 
 
+  It is also possible to pass a function reference in as the changeset.
+
+  ```elixir
+  def my_changeset(model, params) do
+    model
+    |> cast(params, [:name, :email])
+    |> validate_required([:name])
+  end
+
+  insert [name: "Bob"], changeset: &my_changeset/2
+  ```
+
   ## References ##
 
   The internal references to the schema and the provided Ecto Repo are provided as convience functions.
@@ -259,6 +271,7 @@ defmodule EctoSchemaStore do
       require EctoSchemaStore.Event
       import EctoSchemaStore.Event, only: [on: 3]
       import EctoSchemaStore.Alias
+      import Ecto.Changeset
       import Ecto.Query, except: [update: 3]
       alias unquote(repo), as: Repo
 

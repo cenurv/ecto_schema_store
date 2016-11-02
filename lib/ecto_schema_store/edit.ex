@@ -7,6 +7,13 @@ defmodule EctoSchemaStore.Edit do
         [changeset: :changeset]
       end
 
+      defp run_changeset(default_value, params, changeset) when is_atom changeset do
+        apply(unquote(schema), changeset, [default_value, params])
+      end
+      defp run_changeset(default_value, params, changeset) when is_function changeset do
+        changeset.(default_value, params)
+      end
+
       @doc """
       Insert a record into `#{unquote(schema)}` via `#{unquote(repo)}`.
 
@@ -28,7 +35,7 @@ defmodule EctoSchemaStore.Edit do
 
         change = 
           if changeset do
-            apply(unquote(schema), changeset, [default_value, params])
+            run_changeset default_value, params, changeset
           else
             Ecto.Changeset.change(default_value, params)
           end
@@ -100,7 +107,7 @@ defmodule EctoSchemaStore.Edit do
 
         change = 
           if changeset do
-            apply(unquote(schema), changeset, [model, params])
+            run_changeset model, params, changeset
           else
             Ecto.Changeset.change(model, params)
           end
