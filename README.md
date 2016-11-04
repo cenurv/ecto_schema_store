@@ -58,20 +58,20 @@ PersonStore.one 12
 
 Options:
 
-* preload            - An atom or list of atoms with the model association keys to preload.
+* preload            - An atom or list of atoms with the model association keys to preload. Providing `:all` will cause all associations to be preloaded.
 
 ```elixir
 # Get all records in a table.
-PersonStore.all %{}, preload: :field_to_assoc
+PersonStore.all %{}, preload: :field_name
 
 # Get all records fields that match the provided value.
-PersonStore.all %{name: "Bob"}, preload: :field_to_assoc
+PersonStore.all %{name: "Bob"}, preload: [:field_name_1, :field_name_2]
 
 # Return a single record.
-PersonStore.one %{name: "Bob"}, preload: :field_to_assoc
+PersonStore.one %{name: "Bob"}, preload: :all
 
 # Return a specific record by id.
-PersonStore.one 12, preload: :field_to_assoc
+PersonStore.one 12, preload: :all
 ```
 
 ## Filter Operators ##

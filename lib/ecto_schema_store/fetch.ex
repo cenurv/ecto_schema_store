@@ -7,6 +7,9 @@ defmodule EctoSchemaStore.Fetch do
       defp __preload__(model, preload) when is_list preload do
         Enum.reduce preload, model, fn(key, acc) -> unquote(repo).preload(acc, key) end
       end
+      defp __preload__(model, :all) do
+        __preload__ model, schema_associations
+      end
       defp __preload__(model, preload) when is_atom preload do
         __preload__ model, [preload]
       end
