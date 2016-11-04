@@ -56,6 +56,24 @@ PersonStore.one name: "Bob"
 PersonStore.one 12
 ```
 
+Options:
+
+* preload            - An atom or list of atoms with the model association keys to preload.
+
+```elixir
+# Get all records in a table.
+PersonStore.all %{}, preload: :field_to_assoc
+
+# Get all records fields that match the provided value.
+PersonStore.all %{name: "Bob"}, preload: :field_to_assoc
+
+# Return a single record.
+PersonStore.one %{name: "Bob"}, preload: :field_to_assoc
+
+# Return a specific record by id.
+PersonStore.one 12, preload: :field_to_assoc
+```
+
 ## Filter Operators ##
 
 Stores support a special syntax for changing the comparison operator in the passed filter map or keyword list.
