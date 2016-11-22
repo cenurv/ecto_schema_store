@@ -272,7 +272,7 @@ defmodule EctoSchemaStore do
       import EctoSchemaStore.Event, only: [on: 3]
       import EctoSchemaStore.Alias
       import Ecto.Changeset
-      import Ecto.Query, except: [update: 3]
+      import Ecto.Query, except: [update: 3, update: 2]
       alias unquote(repo), as: Repo
 
       @doc """
