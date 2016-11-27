@@ -41,6 +41,24 @@ defmodule EctoSchemaStore.Fetch do
       end
 
       @doc """
+      Cound the number of records that met that query.
+      """
+      def count_records(filters)
+      def count_records(%Ecto.Query{} = query) do
+        query =
+          from q in query,
+          select: count(q.id)
+
+        unquote(repo).one(query)
+      end
+      def count_records(filters) do
+        case build_query(filters) do
+          {:error, _} = error -> error
+          {:ok, query} -> count_records query
+        end
+      end
+
+      @doc """
       Fetch a single record from `#{unquote(schema)}` filtered by provided record id or fields map.
 
       Options:
@@ -61,6 +79,25 @@ defmodule EctoSchemaStore.Fetch do
           {:ok, query} -> __preload__(unquote(repo).one(query), preload)
         end
       end
+
+      @doc """
+      Reloads a single record for `#{unquote(schema)}` from the database.
+      """
+      def refresh(record), do: one record.id
+
+      @doc """
+      Preloads child associations.
+      """
+      def preload_assocs(record, :all), do: preload_assocs(record, schema_associations)
+      def preload_assocs(record, fields) when is_list fields do
+        unquote(repo).preload(record, fields)
+      end
+      def preload_assocs(record, field), do: preload_assocs(record, [field])
+
+      @doc """
+      Returns true if any records match the provided query filters.
+      """
+      def exists?(filters), do: count_records(filters) > 0
     end
   end
 end

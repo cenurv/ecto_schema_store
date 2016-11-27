@@ -292,6 +292,7 @@ defmodule EctoSchemaStore do
       import Ecto.Changeset
       import Ecto.Query, except: [update: 3, update: 2]
       alias unquote(repo), as: Repo
+      alias Ecto.Query
 
       @doc """
       Returns a reference to the schema module `#{unquote(schema)}`.

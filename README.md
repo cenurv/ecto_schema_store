@@ -34,8 +34,12 @@ end
 
 The following functions are provided in a store for retrieving data.
 
-* `all`         - Fetch all records
-* `one`         - Return a single record
+* `all`                 - Fetch all records
+* `one`                 - Return a single record
+* `refresh`             - Reloads an existing record from the database.
+* `preload_assocs`      - Preload record associations. Same as `Repo.preload`. Providing `:all` will cause all associations to be preloaded.
+* `count_records`       - Count the number of records returned by the provided filters.
+* `exists?`             - Returns true if any records exiosts for the provided filters.
 
 Sample Queries:
 
@@ -54,6 +58,15 @@ PersonStore.one name: "Bob"
 
 # Return a specific record by id.
 PersonStore.one 12
+
+# Refresh
+record = PersonStore.one 12
+PersonStore.refresh record
+
+# Preload after query
+PersonStore.preload_assocs record, :field_name
+PersonStore.preload_assocs record, :all
+PersonStore.preload_assocs record, [:field_name_1, :field_name_2]
 ```
 
 Options:
@@ -102,16 +115,20 @@ PersonStore.all name: {:in, ["Bob"]}, email: "bob@nowhere.test"
 
 The following functions are provided in a store for editing data.
 
-* `insert`              - Insert a record based upon supplied parameters map.
-* `insert_fields`       - Insert the record without using a changeset.
-* `insert!`             - Same as `insert` but throws an error instead of returning a tuple.
-* `insert_fields!`      - Same as `insert_fields` but throws an error instead of returning a tuple.
-* `update`              - Update a record based upon supplied parameters map.
-* `update_fields`       - Update the record without using a changeset.
-* `update!`             - Same as `update` but throws an error instead of returning a tuple.
-* `update_fields!`      - Same as `update_fields` but throws an error instead of returning a tuple.
-* `delete`              - Delete a record.
-* `delete!`             - Same as `delete` but throws an error instead of returning a tuple.
+* `insert`                       - Insert a record based upon supplied parameters map.
+* `insert_fields`                - Insert the record without using a changeset.
+* `insert!`                      - Same as `insert` but throws an error instead of returning a tuple.
+* `insert_fields!`               - Same as `insert_fields` but throws an error instead of returning a tuple.
+* `update`                       - Update a record based upon supplied parameters map.
+* `update_fields`                - Update the record without using a changeset.
+* `update!`                      - Same as `update` but throws an error instead of returning a tuple.
+* `update_fields!`               - Same as `update_fields` but throws an error instead of returning a tuple.
+* `update_or_create`             - Updates a record if the provided query values are found. Otherwise creates the record.
+* `update_or_create!`            - Same as `update_or_create` but throws an error instead of returning a tuple.
+* `update_or_create_fields`      - Updates a record if the provided query values are found. Otherwise creates the record. Does not use a changeset.
+* `update_or_create_fields!`     - Same as `update_or_create_fields` but throws an error instead of returning a tuple.
+* `delete`                       - Delete a record.
+* `delete!`                      - Same as `delete` but throws an error instead of returning a tuple.
 
 Sample Usage:
 
@@ -128,6 +145,12 @@ bob = PersonStore.update! bob, email: "bob2@nowhere.test"
 # Updates/deletes can also occur by id.
 PersonStore.update! 12, %{email: "bob2@nowhere.test"}
 PersonStore.delete 12
+
+# Update or create
+attributes_to_update = 
+query = %{name: "Bob"}
+PersonStore.update_or_create attributes_to_update, query
+PersonStore.update_or_create! %{email: "new@nowhere.test"}, name: "Bob"
 ```
 
 ## Changesets ##

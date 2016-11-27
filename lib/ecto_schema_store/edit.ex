@@ -153,6 +153,49 @@ defmodule EctoSchemaStore.Edit do
       end
 
       @doc """
+      Queries for the provided query parameters and updates the record if it is
+      found. If not the record is created.
+      """
+      def update_or_create(attributes, query, opts \\ []) do
+        case one(query) do
+          nil -> insert(attributes, opts)
+          record -> update(record, attributes, opts)
+        end
+      end
+
+      @doc """
+      Like `update_or_create` but throws and error instead of returning a tuple.
+      """
+      def update_or_create!(attributes, query, opts \\ []) do
+        case one(query) do
+          nil -> insert_fields!(attributes, opts)
+          record -> update_fields!(record, attributes, opts)
+        end
+      end
+
+      @doc """
+      Queries for the provided query parameters and updates the record if it is
+      found. If not the record is created. Just saves without passing through a
+      changeset.
+      """
+      def update_or_create_fields(attributes, query) do
+        case one(query) do
+          nil -> insert_fields attributes
+          record -> update_fields record, attributes
+        end
+      end
+
+      @doc """
+      Like `update_or_create` but throws and error instead of returning a tuple.
+      """
+      def update_or_create_fields!(attributes, query) do
+        case one(query) do
+          nil -> insert_fields! attributes
+          record -> update_fields! record, attributes
+        end
+      end
+
+      @doc """
       Deletes a record in `#{unquote(schema)}` via `#{unquote(repo)}`.
       """
       def delete(id_or_model) do
