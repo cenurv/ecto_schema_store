@@ -39,7 +39,7 @@ The following functions are provided in a store for retrieving data.
 * `refresh`             - Reloads an existing record from the database.
 * `preload_assocs`      - Preload record associations. Same as `Repo.preload`. Providing `:all` will cause all associations to be preloaded.
 * `count_records`       - Count the number of records returned by the provided filters.
-* `exists?`             - Returns true if any records exiosts for the provided filters.
+* `exists?`             - Returns true if any records exists for the provided filters.
 
 Sample Queries:
 
