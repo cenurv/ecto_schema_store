@@ -40,6 +40,7 @@ The following functions are provided in a store for retrieving data.
 * `preload_assocs`      - Preload record associations. Same as `Repo.preload`. Providing `:all` will cause all associations to be preloaded.
 * `count_records`       - Count the number of records returned by the provided filters.
 * `exists?`             - Returns true if any records exists for the provided filters.
+* `destructure`         - Return the model as generic Elixir maps without the Ecto content
 
 Sample Queries:
 
@@ -61,17 +62,21 @@ PersonStore.one 12
 
 # Refresh
 record = PersonStore.one 12
-PersonStore.refresh record
+record = PersonStore.refresh record
 
 # Preload after query
 PersonStore.preload_assocs record, :field_name
 PersonStore.preload_assocs record, :all
 PersonStore.preload_assocs record, [:field_name_1, :field_name_2]
+
+# Destructure
+record = Person.destructure Person.one 12
 ```
 
 Options:
 
 * preload            - An atom or list of atoms with the model association keys to preload. Providing `:all` will cause all associations to be preloaded.
+* destructure        - Return the models as generic Elixir maps without the Ecto content. Defaults: `false` 
 
 ```elixir
 # Get all records in a table.
@@ -84,7 +89,7 @@ PersonStore.all %{name: "Bob"}, preload: [:field_name_1, :field_name_2]
 PersonStore.one %{name: "Bob"}, preload: :all
 
 # Return a specific record by id.
-PersonStore.one 12, preload: :all
+PersonStore.one 12, preload: :all, destructure: true
 ```
 
 ## Filter Operators ##
