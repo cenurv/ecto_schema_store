@@ -3,7 +3,7 @@ defmodule EctoSchemaStore.Alias do
 
   defmacro build do
     quote do
-      defp alias_filters(filters), do: generalize_keys(filters)
+      def alias_filters(filters), do: generalize_keys(filters)
 
       defp generalize_keys(entries) when is_list entries do
         for entry <- entries do
@@ -33,7 +33,20 @@ defmodule EctoSchemaStore.Alias do
 
   defmacro alias_fields(keywords) do
     quote do
-      defp alias_filters(filters) do
+      def alias_filters(filters) when is_list filters do
+        aliases = unquote(keywords)
+
+        for {key, value} <- filters do
+          new_key = Keyword.get aliases, key, nil
+
+          if new_key do
+            {new_key, value}
+          else
+            {key, value}
+          end
+        end
+      end
+      def alias_filters(filters) do
         filters = generalize_keys(filters)
         aliases = unquote(keywords)
 

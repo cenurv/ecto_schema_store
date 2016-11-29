@@ -144,6 +144,39 @@ defmodule EctoSchemaStore.BuildQueries do
         in_map_entry = Code.string_to_quoted! "%{#{key}: {:in, _}}"
 
         quote do
+          # Keyword queries
+          defp build_keyword_query(query, unquote(key), {:in, value}) do
+            {:ok, EctoSchemaStore.BuildQueries.build_ecto_query(query, :in, unquote(key), ^value)}
+          end
+          defp build_keyword_query(query, unquote(key), {:>=, value}) do
+            {:ok, EctoSchemaStore.BuildQueries.build_ecto_query(query, :gte, unquote(key), ^value)}
+          end
+          defp build_keyword_query(query, unquote(key), {:>, value}) do
+            {:ok, EctoSchemaStore.BuildQueries.build_ecto_query(query, :gt, unquote(key), ^value)}
+          end
+          defp build_keyword_query(query, unquote(key), {:<=, value}) do
+            {:ok, EctoSchemaStore.BuildQueries.build_ecto_query(query, :lte, unquote(key), ^value)}
+          end
+          defp build_keyword_query(query, unquote(key), {:<, value}) do
+            {:ok, EctoSchemaStore.BuildQueries.build_ecto_query(query, :lt, unquote(key), ^value)}
+          end
+          defp build_keyword_query(query, unquote(key), {:!=, nil}) do
+            {:ok, EctoSchemaStore.BuildQueries.build_ecto_query(query, :not_nil, unquote(key))}
+          end
+          defp build_keyword_query(query, unquote(key), {:==, nil}) do
+            {:ok, EctoSchemaStore.BuildQueries.build_ecto_query(query, :is_nil, unquote(key))}
+          end
+          defp build_keyword_query(query, unquote(key), {:!=, value}) do
+            {:ok, EctoSchemaStore.BuildQueries.build_ecto_query(query, :not, unquote(key), ^value)}
+          end
+          defp build_keyword_query(query, unquote(key), {:==, value}) do
+            {:ok, EctoSchemaStore.BuildQueries.build_ecto_query(query, :eq, unquote(key), ^value)}
+          end
+          defp build_keyword_query(query, unquote(key), value) do
+            {:ok, EctoSchemaStore.BuildQueries.build_ecto_query(query, :eq, unquote(key), ^value)}
+          end
+
+          # Map queries
           defp build_query(query, unquote(is_nil_map_entry) = filters) do
             query = EctoSchemaStore.BuildQueries.build_ecto_query(query, :is_nil, unquote(key))
 
@@ -225,6 +258,16 @@ defmodule EctoSchemaStore.BuildQueries do
         def schema_fields, do: unquote(keys)
         def schema_associations, do: unquote(assocs)
 
+        defp build_keyword_query(query, key, _value) do
+          {:error, "Invalid field for #{unquote(schema)} '#{key}'"}
+        end
+        defp build_query(query, []), do: {:ok, query}
+        defp build_query(query, [{key, value} | t]) do
+          case build_keyword_query(query, key, value) do
+            {:ok, query} -> build_query query, t
+            {:error, _message} = error -> error
+          end
+        end
         defp build_query(query, %{} = filters) do
           if Enum.empty? filters do
             {:ok, query}
@@ -234,14 +277,12 @@ defmodule EctoSchemaStore.BuildQueries do
         end
 
         @doc """
-        Build an `Ecto.Query` from the provided fields and values map.
+        Build an `Ecto.Query` from the provided fields and values map. A keyword list builds
+        a query in the order of the provided keys. Maps do not guarantee an order.
 
         Available fields: `#{inspect unquote(keys)}`
         """
-        def build_query(filters \\ %{})
-        def build_query(filters) when is_list filters do
-          build_query Enum.into(filters, %{})
-        end
+        def build_query(filters \\ [])
         def build_query(filters) do
           build_query unquote(schema), alias_filters(filters)
         end
@@ -251,10 +292,7 @@ defmodule EctoSchemaStore.BuildQueries do
 
         Available fields: `#{inspect unquote(keys)}`
         """
-        def build_query!(filters \\ %{})
-        def build_query!(filters) when is_list filters do
-          build_query! Enum.into(filters, %{})
-        end
+        def build_query!(filters \\ [])
         def build_query!(filters) do
           case build_query(filters) do
             {:error, reason} -> throw reason
