@@ -172,6 +172,9 @@ defmodule EctoSchemaStore.BuildQueries do
           defp build_keyword_query(query, unquote(key), {:==, value}) do
             {:ok, EctoSchemaStore.BuildQueries.build_ecto_query(query, :eq, unquote(key), ^value)}
           end
+          defp build_keyword_query(query, unquote(key), nil) do
+            {:ok, EctoSchemaStore.BuildQueries.build_ecto_query(query, :is_nil, unquote(key))}
+          end
           defp build_keyword_query(query, unquote(key), value) do
             {:ok, EctoSchemaStore.BuildQueries.build_ecto_query(query, :eq, unquote(key), ^value)}
           end
