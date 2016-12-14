@@ -311,14 +311,17 @@ defmodule EctoSchemaStore do
 
     quote do
       import EctoSchemaStore
+      require Logger
       require EctoSchemaStore.Fetch
       require EctoSchemaStore.BuildQueries
       require EctoSchemaStore.Edit
       require EctoSchemaStore.Event
+      require EctoSchemaStore.Factory
       import EctoSchemaStore.Event, only: [on: 3]
       import EctoSchemaStore.Alias
       import Ecto.Changeset
       import Ecto.Query, except: [update: 3, update: 2]
+      import EctoSchemaStore.Factory
       alias unquote(repo), as: Repo
       alias Ecto.Query
 
@@ -336,6 +339,7 @@ defmodule EctoSchemaStore do
       EctoSchemaStore.BuildQueries.build(unquote(schema))
       EctoSchemaStore.Fetch.build(unquote(schema), unquote(repo))
       EctoSchemaStore.Edit.build(unquote(schema), unquote(repo))
+      EctoSchemaStore.Factory.build(unquote(schema))
     end
   end
 

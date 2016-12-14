@@ -279,6 +279,75 @@ PersonStore.one %{name: "Bob", email: "bob@nowhere.test"}
 PersonStore.get_by :name_and_email, ["Bob", "bob@nowhere.test"]
 ```
 
+## Generator Factories ##
+
+Sometimes, such as in unit testing, a developer would like to create a common predefined data structure
+to work against. Generator Factories provide a composable method to create such a data strcture. There
+two trypes of factory methods that can be used. One to create a common factory base for the store and
+another to append upon that base if it is used. The base factory is optional and not required.
+
+If a default fatcory does not exist then the defaults will be used as defined in the Struct ecto will
+generate for the schema.
+
+Macros:
+
+* `factory`               - Generates a factory segment of values. When no name is provided the fatcory is the automatic base for all factories.
+
+Functions:
+
+* `generate`              - Takes a list of atoms and generates a new record in the database based upon the factories matching the atom.
+* `generate!`             - Like `generate` but throws the error instead of returning a tuple.
+* `generate_default`      - Like `generate` but only applies the base factory. When no base is defined, uses the defaults from the Struct Ecto generates.
+* `generate_default!`     - Like `generate_default` but throws the error instead of returning a tuple.
+
+```elixir
+defmodule PersonStore do
+  use EctoSchemaStore, schema: Person, repo: MyApp.Repo
+
+  # Create the common base for starting factory generated record.
+  factory do
+    %{
+      name: "Test Person",
+      email: "test@nowhere.test"
+    }
+  end
+
+  # Create a factory segment to override the base factory values.
+  factory bob do
+    %{
+      name: "Bob"
+    }
+  end
+
+  factory karen do
+    %{
+      name: "Karen"
+    }
+  end
+end
+
+# Sample Usage
+
+# Using just the base
+%Person{name: "Test Person", email: "test@nowhere.test"} = PersonStore.generate!
+{:ok, %Person{name: "Test Person", email: "test@nowhere.test"}} = PersonStore.generate
+
+# Using bob Factory
+%Person{name: "Bob", email: "test@nowhere.test"} = PersonStore.generate! :bob
+
+# Using karen factory
+%Person{name: "Karen", email: "test@nowhere.test"} = PersonStore.generate! :karen
+
+# Using multiple factories, each is overlayed in order.
+%Person{name: "Karen", email: "test@nowhere.test"} = PersonStore.generate! [:bob, :karen]
+%Person{name: "Bob", email: "test@nowhere.test"} = PersonStore.generate! [:karen, :bob]
+
+# Manually setting values
+%Person{name: "Test Person", email: "ignore@nowhere.test"} = PersonStore.generate_default! email: "ignore@nowhere.test"
+%Person{name: "Bob", email: "bob@nowhere.test"} = PersonStore.generate! :bob, email: "bob@nowhere.test"
+%Person{name: "Karen", email: "karen@nowhere.test"} = PersonStore.generate! [:bob, :karen], email: "karen@nowhere.test"
+```
+
 ## Edit Events ##
 
 A store supports the concept of an event after an edit action is successful in the Ecto repo.
