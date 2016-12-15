@@ -1,7 +1,7 @@
 defmodule EctoSchemaStore.Factory do
   @moduledoc false
 
-  defmacro build(schema) do
+  defmacro build do
     quote do
       def generate(keys \\ []) do
         generate keys, %{}

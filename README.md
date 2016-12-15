@@ -282,11 +282,11 @@ PersonStore.get_by :name_and_email, ["Bob", "bob@nowhere.test"]
 ## Generator Factories ##
 
 Sometimes, such as in unit testing, a developer would like to create a common predefined data structure
-to work against. Generator Factories provide a composable method to create such a data strcture. There
-two trypes of factory methods that can be used. One to create a common factory base for the store and
+to work against. Generator Factories provide a composable method to create such a data structure. There
+two types of factory methods that can be used. One to create a common factory base for the store and
 another to append upon that base if it is used. The base factory is optional and not required.
 
-If a default fatcory does not exist then the defaults will be used as defined in the Struct ecto will
+If a default factory does not exist then the defaults will be used as defined in the Struct ecto will
 generate for the schema.
 
 Macros:
