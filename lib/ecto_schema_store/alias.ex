@@ -18,11 +18,7 @@ defmodule EctoSchemaStore.Alias do
               false -> String.to_atom(key)
             end
 
-          cond do
-            is_map(value) and not Map.has_key?(value, :__struct__) -> {key, generalize_keys(value)}
-            is_list(value) -> {key, generalize_keys(value)}
-            true -> {key, value}
-          end
+          {key, value}
         end
       end
       defp generalize_keys(value), do: value
