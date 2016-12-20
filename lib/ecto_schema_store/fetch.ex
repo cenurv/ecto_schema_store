@@ -151,6 +151,10 @@ defmodule EctoSchemaStore.Fetch do
       defp convert_value(key, %Ecto.Time{} = value, true), do: {key, value |> Ecto.Time.to_erl |> Time.from_erl!}
       defp convert_value(key, %Ecto.Date{} = value, true), do: {key, value |> Ecto.Date.to_erl |> Date.from_erl!}
       defp convert_value(key, %Ecto.DateTime{} = value, true), do: {key, value |> Ecto.DateTime.to_erl |> NaiveDateTime.from_erl!}
+      defp convert_value(key, %DateTime{} = value, true), do: {key, value}
+      defp convert_value(key, %Date{} = value, true), do: {key, value}
+      defp convert_value(key, %Time{} = value, true), do: {key, value}
+      defp convert_value(key, %NaiveDateTime{} = value, true), do: {key, value}
       defp convert_value(key, %{} = value, convert_ecto), do: {key, convert_model_to_map(value, convert_ecto)}
       defp convert_value(key, [%{} = h | t], convert_ecto) do
         first = convert_model_to_map(h, convert_ecto)
