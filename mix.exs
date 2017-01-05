@@ -1,7 +1,7 @@
 defmodule EctoStore.Mixfile do
   use Mix.Project
 
-  @version "1.5.1"
+  @version "1.6.0"
 
   def project do
     [app: :ecto_schema_store,
@@ -27,7 +27,7 @@ defmodule EctoStore.Mixfile do
   #
   # Type "mix help compile.app" for more information
   def application do
-    [applications: [:logger]]
+    [extra_applications: [:logger]]
   end
 
   # Dependencies can be Hex packages:
@@ -40,7 +40,7 @@ defmodule EctoStore.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    [{:ecto, "~> 2.0"},
-     {:ex_doc, "~> 0.14.3", only: :dev}]
+    [{:ecto, "~> 2.0", runtime: false},
+     {:ex_doc, "~> 0.14.3", only: :dev, runtime: false}]
   end
 end

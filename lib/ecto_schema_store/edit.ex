@@ -26,7 +26,7 @@ defmodule EctoSchemaStore.Edit do
         insert Enum.into(params, %{}), opts
       end
       def insert(params, opts) do
-        opts = Keyword.merge default_edit_options, opts
+        opts = Keyword.merge default_edit_options(), opts
         changeset = Keyword.get opts, :changeset
 
         default_value = struct unquote(schema), %{}
@@ -53,7 +53,7 @@ defmodule EctoSchemaStore.Edit do
       """
       def insert_fields(params, opts \\ []) do
         opts =
-          Keyword.merge(default_edit_options, opts)
+          Keyword.merge(default_edit_options(), opts)
           |> Keyword.merge([changeset: nil])
 
         insert params, opts
@@ -74,7 +74,7 @@ defmodule EctoSchemaStore.Edit do
       """
       def insert_fields!(params, opts \\ []) do
         opts =
-          Keyword.merge(default_edit_options, opts)
+          Keyword.merge(default_edit_options(), opts)
           |> Keyword.merge([changeset: nil])
 
         insert! params, opts
@@ -92,7 +92,7 @@ defmodule EctoSchemaStore.Edit do
         update id_or_model, Enum.into(params, %{}), opts
       end
       def update(id_or_model, params, opts) do
-        opts = Keyword.merge default_edit_options, opts
+        opts = Keyword.merge default_edit_options(), opts
         changeset = Keyword.get opts, :changeset
 
         repo = unquote(repo)
@@ -125,7 +125,7 @@ defmodule EctoSchemaStore.Edit do
       """
       def update_fields(id_or_model, params, opts \\ []) do
         opts =
-          Keyword.merge(default_edit_options, opts)
+          Keyword.merge(default_edit_options(), opts)
           |> Keyword.merge([changeset: nil])
 
         update id_or_model, params, opts
@@ -146,7 +146,7 @@ defmodule EctoSchemaStore.Edit do
       """
       def update_fields!(id_or_model, params, opts \\ []) do
         opts =
-          Keyword.merge(default_edit_options, opts)
+          Keyword.merge(default_edit_options(), opts)
           |> Keyword.merge([changeset: nil])
 
         update! id_or_model, params, opts

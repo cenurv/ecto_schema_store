@@ -9,7 +9,7 @@ defmodule EctoSchemaStore.Event do
       override = Keyword.put [], name, 1
 
       quote do
-        defp unquote(name)(_), do: nil
+        def unquote(name)(_), do: nil
 
         defoverridable unquote(override)
       end

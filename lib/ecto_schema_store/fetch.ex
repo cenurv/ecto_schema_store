@@ -8,7 +8,7 @@ defmodule EctoSchemaStore.Fetch do
         Enum.reduce preload, model, fn(key, acc) -> unquote(repo).preload(acc, key) end
       end
       defp __preload__(model, :all) do
-        __preload__ model, schema_associations
+        __preload__ model, schema_associations()
       end
       defp __preload__(model, preload) when is_atom preload do
         __preload__ model, [preload]
@@ -113,7 +113,7 @@ defmodule EctoSchemaStore.Fetch do
       @doc """
       Preloads child associations.
       """
-      def preload_assocs(record, :all), do: preload_assocs(record, schema_associations)
+      def preload_assocs(record, :all), do: preload_assocs(record, schema_associations())
       def preload_assocs(record, fields) when is_list fields do
         unquote(repo).preload(record, fields)
       end
