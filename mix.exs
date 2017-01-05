@@ -16,11 +16,12 @@ defmodule EctoStore.Mixfile do
        licenses: ["Apache 2.0"],
        maintainers: ["Joseph Lindley"],
        links: %{"GitHub" => "https://github.com/cenurv/ecto_schema_store"},
-       files: ~w(mix.exs README.md lib)
+       files: ~w(mix.exs README.md CHANGELOG.md lib)
      },
-     docs: [source_ref: "v#{@version}", main: "EctoSchemaStore",
-           canonical: "http://hexdocs.pm/ecto_schema_store",
-           source_url: "https://github.com/cenurv/ecto_schema_store"]]
+     docs: [source_ref: "v#{@version}", main: "readme",
+            canonical: "http://hexdocs.pm/ecto_schema_store",
+            source_url: "https://github.com/cenurv/ecto_schema_store",
+            extras: ["CHANGELOG.md", "README.md"]]]
   end
 
   # Configuration for the OTP application
@@ -41,6 +42,6 @@ defmodule EctoStore.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [{:ecto, "~> 2.0"},
-     {:ex_doc, "~> 0.14.3", only: :dev}]
+     {:ex_doc, "~> 0.14", only: [:docs, :dev]}]
   end
 end

@@ -2,6 +2,7 @@
 
 This library is used to create customizable data stores for individual ecto schemas.
 
+## Getting Started ##
 With the following schema:
 
 ```elixir
