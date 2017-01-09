@@ -14,8 +14,25 @@ defmodule EctoSchemaStore.Fetch do
         __preload__ model, [preload]
       end
 
-      defp __destructure__(model, true), do: destructure(model)
-      defp __destructure__(model, false), do: model
+      defp __to_map__(model, true), do: to_map(model)
+      defp __to_map__(model, false), do: model
+
+      defp __order_by__(query, nil), do: query
+      defp __order_by__(query, order_list) when is_atom order_list do
+        __order_by__ query, [order_list]
+      end
+      defp __order_by__(query, order_list) do
+        from m in schema(),
+        order_by: ^order_list
+      end
+
+      defp __limit_to_first__(results) when is_list results do
+        Enum.at results, 0
+      end
+      defp __limit_to_first__([]) do
+        nil
+      end
+      defp __limit_to_first__(results), do: results
 
       @doc """
       Fetch all records from `#{unquote(schema)}`.
@@ -28,29 +45,38 @@ defmodule EctoSchemaStore.Fetch do
       Options:
 
       * `preload`              - Atom or array of atoms with the associations to preload.
-      * `destructure`          - Should the record model be converted from its struct to a generic map. Default: `false`
+      * `to_map`               - Should the record model be converted from its struct to a generic map. Default: `false`
+      * `order_by`             - Order the results by a the provided keyword list.
       """
       def all(filters, opts \\ [])
       def all(%Ecto.Query{} = query, opts) do
         preload = Keyword.get opts, :preload, []
         destruct = Keyword.get opts, :destructure, false
+        to_map = Keyword.get opts, :to_map, false
+        to_map = destruct || to_map
+        order_list = Keyword.get opts, :order_by, nil
 
         query
+        |> __order_by__(order_list)
         |> unquote(repo).all
         |> __preload__(preload)
-        |> __destructure__(destruct)
+        |> __to_map__(to_map)
       end
       def all(filters, opts) do
         preload = Keyword.get opts, :preload, []
         destruct = Keyword.get opts, :destructure, false
+        to_map = Keyword.get opts, :to_map, false
+        to_map = destruct or to_map
+        order_list = Keyword.get opts, :order_by, nil
 
         case build_query(filters) do
           {:error, _} = error -> error
           {:ok, query} ->
             query
+            |> __order_by__(order_list)
             |> unquote(repo).all
             |> __preload__(preload)
-            |> __destructure__(destruct)
+            |> __to_map__(to_map)
         end
       end
 
@@ -73,35 +99,49 @@ defmodule EctoSchemaStore.Fetch do
       end
 
       @doc """
-      Fetch a single record from `#{unquote(schema)}` filtered by provided record id or fields map.
+      Fetch a single record from `#{unquote(schema)}` filtered by provided record id or fields map. If multiple
+      records are returned. Will return the first record. This operation will not return an error if more than
+      one record is found.
 
       Options:
 
       * `preload`              - Atom or array of atoms with the associations to preload.
-      * `destructure`          - Should the record model be converted from its struct to a generic map. Default: `false`
+      * `to_map`               - Should the record model be converted from its struct to a generic map. Default: `false`
+      * `order_by`             - Order the results by a the provided keyword list.
       """
       def one(filters, opts \\ [])
+      def one(id, opts) when is_binary(id), do: one String.to_integer(id), opts
       def one(id, opts) when is_integer(id) and id > 0, do: one %{id: id}, opts
       def one(%Ecto.Query{} = query, opts) do
         preload = Keyword.get opts, :preload, []
         destruct = Keyword.get opts, :destructure, false
+        to_map = Keyword.get opts, :to_map, false
+        to_map = destruct or to_map
+        order_list = Keyword.get opts, :order_by, nil
 
         query
-        |> unquote(repo).one
+        |> __order_by__(order_list)
+        |> unquote(repo).all
+        |> __limit_to_first__
         |> __preload__(preload)
-        |> __destructure__(destruct)
+        |> __to_map__(to_map)
       end
       def one(filters, opts) do
         preload = Keyword.get opts, :preload, []
-        destruct = Keyword.get opts, :destructure, false 
+        destruct = Keyword.get opts, :destructure, false
+        to_map = Keyword.get opts, :to_map, false
+        to_map = destruct or to_map
+        order_list = Keyword.get opts, :order_by, nil
 
         case build_query(filters) do
           {:error, _} = error -> error
           {:ok, query} ->
             query
-            |> unquote(repo).one
+            |> __order_by__(order_list)
+            |> unquote(repo).all
+            |> __limit_to_first__
             |> __preload__(preload)
-            |> __destructure__(destruct)
+            |> __to_map__(to_map)
         end
       end
 
@@ -126,12 +166,23 @@ defmodule EctoSchemaStore.Fetch do
 
       @doc """
       Convert the provided record to a generic map and Ecto date or time values to
+      Elixir 1.3 equivalents. Replaces `destructure`.
+      """
+      def to_map(record) when is_list record do
+        Enum.map record, fn(entry) -> to_map entry end
+      end
+      def to_map(record), do: convert_model_to_map record
+
+      @doc """
+      ## Deprecated ##
+
+      Convert the provided record to a generic map and Ecto date or time values to
       Elixir 1.3 equivalents.
       """
-      def destructure(record) when is_list record do
-        Enum.map record, fn(entry) -> destructure entry end
+      def destructure(record) do
+        Logger.warn "The destructure function is deprecated. Please use to_map on a Store. Occurring on a call to #{__MODULE__}"
+        to_map record
       end
-      def destructure(record), do: convert_model_to_map record
 
       defp convert_model_to_map(model, convert_ecto \\ true)
       defp convert_model_to_map(nil, _convert_ecto), do: nil

@@ -2,6 +2,8 @@ defmodule EctoSchemaStore.Edit do
   @moduledoc false
 
   defmacro build(schema, repo) do
+    keys = EctoSchemaStore.Utils.keys(Macro.expand(schema, __CALLER__), false)
+
     quote do
       defp default_edit_options do
         [changeset: :changeset]
@@ -22,6 +24,16 @@ defmodule EctoSchemaStore.Edit do
       * `:changeset`        - By default use :changeset on the schema otherwise use the provided changeset name.
       """
       def insert(params \\ %{}, opts \\ [])
+      def insert(%unquote(schema){} = model, _opts) do
+        repo = unquote(repo)
+
+        case repo.insert model do
+          {:error, _} = error -> error
+          {:ok, model} = result ->
+            on_after_insert(model)
+            {:ok, model}
+        end
+      end
       def insert(params, opts) when is_list params do
         insert Enum.into(params, %{}), opts
       end
@@ -193,6 +205,52 @@ defmodule EctoSchemaStore.Edit do
           nil -> insert_fields! attributes
           record -> update_fields! record, attributes
         end
+      end
+
+      @doc """
+      ## Experimental ##
+
+      A update statement sent direct to the data store. Uses `Ecto.Repo.update_all`, will
+      not update autogenerate field. However, if :updated_at is present, the value will be
+      passed a new Ecto.NaiveDateTime value. Changeset will not be applied.
+      Use with caution. Query params will be processed like `all` or `one`.
+      
+      Currently not documented, experimental addition. This may be better set up in the
+      individual store using the following code:
+
+      ```elixir
+      def update_all(query: query_params, set: params) do
+        repo().update_all build_query!(query_params), [set: params]
+      end
+      ```
+
+      This can then be modified specifically to the use case and not applied to all Repos.
+      I may change my mind about this, so I would not reccommend making code dependent upon
+      this yet.
+
+      The biggest reasons for the hesitation is that `Ecto.Repo.update_all` basically just
+      submits as is to the database and may provide other options that will not be
+      supported here as that this is mean't to be a simplistic implementation.
+      """
+      def update_all(query: query_params, set: params) when is_map params do
+        update_all query: query_params, set: Enum.into(params, [])
+      end
+      def update_all(query: query_params, set: params) do
+        keys = unquote(keys)
+        params =
+          if :updated_at in keys do
+            updated_at = Keyword.get params, :updated_at, :undefined
+
+            if updated_at == :undefined do
+              Enum.concat params, [updated_at: DateTime.to_naive(DateTime.utc_now)]
+            else
+              params
+            end
+          else
+            params
+          end
+
+        repo().update_all build_query!(query_params), [set: params]
       end
 
       @doc """
