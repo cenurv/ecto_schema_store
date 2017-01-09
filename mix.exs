@@ -9,6 +9,7 @@ defmodule EctoStore.Mixfile do
      elixir: "~> 1.3",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
+     compilers: [:gettext] ++ Mix.compilers,
      deps: deps(),
      description: "Builds upon Ecto to create a ready to go customizable CRUD module for a schema.",
      name: "Ecto Schema Store",
@@ -28,7 +29,7 @@ defmodule EctoStore.Mixfile do
   #
   # Type "mix help compile.app" for more information
   def application do
-    [applications: [:logger]]
+    [applications: [:logger, :gettext]]
   end
 
   # Dependencies can be Hex packages:
@@ -42,6 +43,7 @@ defmodule EctoStore.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [{:ecto, "~> 2.0"},
-     {:ex_doc, "~> 0.14", only: [:docs, :dev]}]
+     {:ex_doc, "~> 0.14", only: [:docs, :dev]},
+     {:gettext, "~> 0.13"}]
   end
 end

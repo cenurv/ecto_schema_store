@@ -1,5 +1,8 @@
 # Change Log #
 
+## 1.7.1 ##
+* Added Parser for common changeset errors.
+
 ## 1.7.0 ##
 
 * Added inserting of struct directly to all insert methods. This will bypass a changeset just as it does in Ecto.

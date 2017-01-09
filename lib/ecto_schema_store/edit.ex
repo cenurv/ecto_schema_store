@@ -40,6 +40,7 @@ defmodule EctoSchemaStore.Edit do
       def insert(params, opts) do
         opts = Keyword.merge default_edit_options(), opts
         changeset = Keyword.get opts, :changeset
+        errors_to_map = Keyword.get opts, :errors_to_map, false
 
         default_value = struct unquote(schema), %{}
         repo = unquote(repo)
@@ -53,7 +54,12 @@ defmodule EctoSchemaStore.Edit do
           end
 
         case repo.insert change do
-          {:error, _} = error -> error
+          {:error, changeset} = error ->
+            if errors_to_map do
+              {:error, EctoSchemaStore.Utils.interpret_errors(changeset, errors_to_map)}
+            else
+              error
+            end
           {:ok, model} = result ->
             on_after_insert(model)
             {:ok, model}
@@ -106,6 +112,7 @@ defmodule EctoSchemaStore.Edit do
       def update(id_or_model, params, opts) do
         opts = Keyword.merge default_edit_options(), opts
         changeset = Keyword.get opts, :changeset
+        errors_to_map = Keyword.get opts, :errors_to_map, false
 
         repo = unquote(repo)
         params = alias_filters(params)
@@ -125,7 +132,12 @@ defmodule EctoSchemaStore.Edit do
           end
 
         case repo.update change do
-          {:error, _} = error -> error
+          {:error, changeset} = error ->
+            if errors_to_map do
+              {:error, EctoSchemaStore.Utils.interpret_errors(changeset, errors_to_map)}
+            else
+              error
+            end
           {:ok, model} = result ->
             on_after_update(model)
             {:ok, model}

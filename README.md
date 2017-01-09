@@ -142,6 +142,11 @@ The following functions are provided in a store for editing data.
 * `delete`                       - Delete a record.
 * `delete!`                      - Same as `delete` but throws an error instead of returning a tuple.
 
+Options:
+
+* `changeset`                    - Provide and atom, or function reference for the changeset to use. Default `:changeset`
+* `errors_to_map`                - If an error occurs, the changeset error is converted to a JSON encoding firendly map. When given an atom, sets the root id to the atom. Default: `false`
+
 Sample Usage:
 
 ```elixir
