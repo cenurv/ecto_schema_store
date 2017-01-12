@@ -1,7 +1,7 @@
 defmodule EctoStore.Mixfile do
   use Mix.Project
 
-  @version "1.7.0"
+  @version "1.7.1"
 
   def project do
     [app: :ecto_schema_store,
