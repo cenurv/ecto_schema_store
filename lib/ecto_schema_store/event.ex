@@ -2,13 +2,19 @@ defmodule EctoSchemaStore.Event do
   @moduledoc false
 
   defmacro build do
-    all_events = [:after_insert, :after_update, :after_delete, :before_insert, :before_update, :beforE_delete]
+    all_events = [:after_insert, :after_update, :after_delete, :before_insert, :before_update, :before_delete]
 
     for event <- all_events do
       name = String.to_atom "on_#{event}"
-      override = Keyword.put [], name, 1
+      has_name = String.to_atom "has_#{event}?"
+
+      override =
+        []
+        |> Keyword.put(name, 1)
+        |> Keyword.put(has_name, 0)
 
       quote do
+        def unquote(has_name)(), do: false
         def unquote(name)(_), do: nil
 
         defoverridable unquote(override)
@@ -28,37 +34,42 @@ defmodule EctoSchemaStore.Event do
     end
   end
 
-  defmacro announce(events: events) do
+  defmacro announces(events: events) do
     quote do
-      announce events: unquote(events), queue: [__MODULE__.Queue]
+      announces events: unquote(events), queues: [__MODULE__.Queue]
     end
   end
-  defmacro announce(events: events, queues: queues) when is_atom events do
-    quote do
-      announce events: [unquote(events)], queue: unquote(queues)
-    end
-  end
-  defmacro announce(events: events, queues: queues) when not is_list(queues) do
-    quote do
-      announce events: unquote(events), queue: [unquote(queues)]
-    end
-  end
-  defmacro announce(events: events, queues: queues) do
-    if Code.ensure_compiled?(EventQueues) do
-      quote do
-        for event <- events do
-          name = String.to_atom "on_#{event}"
 
-          for queue <- queues do
-            quote do
-              def unquote(name)(event), do: unquote(queue).announce event
-            end
+  defmacro announces(events: events, queues: queues) when not is_list(events) do
+    quote do
+      announces events: [unquote(events)], queues: unquote(queues)
+    end
+  end
+  defmacro announces(events: events, queues: queues) when not is_list(queues) do
+    quote do
+      announces events: unquote(events), queues: [unquote(queues)]
+    end
+  end
+  defmacro announces(events: events, queues: queues) do
+    if Code.ensure_compiled?(EventQueues) do
+      for event <- events do
+        name = String.to_atom "on_#{event}"
+        has_name = String.to_atom "has_#{event}?"
+
+        for queue <- queues do
+          quote do
+            def unquote(has_name)(), do: true
+            def unquote(name)(event), do: unquote(queue).announce event
           end
         end
       end
     else
       throw "EventQueues must be included in your application to use Schema Store Events"
     end
+  end
+  defmacro announces(anything) do
+    IO.inspect anything
+    []
   end
 
 

@@ -378,7 +378,7 @@ Events:
 Macros:
 
 * `create_queue`               - Creates a Queue for instances where one is not already set up. Accessible at {store module name}.Queue
-* `announce`                   - Register a what events to announce and what modules to send the event. By default will use {store}.Queue
+* `announces`                   - Register a what events to announce and what modules to send the event. By default will use {store}.Queue
 
 ```elixir
 defmodule PersonStore do
@@ -386,7 +386,7 @@ defmodule PersonStore do
 
   create_queue
 
-  announce events: [:after_delete, :after_update]
+  announces events: [:after_delete, :after_update]
 end
 
 defmodule PersonEventHandler do
@@ -416,7 +416,7 @@ end
 defmodule PersonStore do
   use EctoSchemaStore, schema: Person, repo: MyApp.Repo
 
-  announce events: [:after_delete, :after_update],
+  announces events: [:after_delete, :after_update],
            queues: [Queue1, Queue2]
 end
 
@@ -448,7 +448,7 @@ defmodule PersonStore do
 
   create_queue
 
-  announce events: [:before_update]
+  announces events: [:before_update]
 end
 
 defmodule PersonEventHandler do

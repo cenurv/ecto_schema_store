@@ -18,7 +18,7 @@ defmodule EctoSchemaStore do
       require EctoSchemaStore.Edit
       require EctoSchemaStore.Event
       require EctoSchemaStore.Factory
-      import EctoSchemaStore.Event, only: [on: 3]
+      import EctoSchemaStore.Event, only: [announces: 1, create_queue: 0]
       import EctoSchemaStore.Alias
       import Ecto.Changeset
       import Ecto.Query, except: [update: 3, update: 2]
