@@ -360,26 +360,112 @@ end
 %Person{name: "Karen", email: "karen@nowhere.test"} = PersonStore.generate! [:bob, :karen], email: "karen@nowhere.test"
 ```
 
-## Edit Events ##
+## Event Announcements ##
 
-A store supports the concept of an event after an edit action is successful in the Ecto repo.
+A store supports the concept of an event through the [Event Queues](https://hex.pm/packages/event_queues) library on Hex.
+Event Queues must be included in your application and each queue and handler added to your application supervisor. Visit
+the instructions at (https://hexdocs.pm/event_queues) for more details.
 
 Events:
 
+* `:before_insert`
+* `:before_update`
+* `:before_delete`
 * `:after_insert`
 * `:after_update`
 * `:after_delete`
+
+Macros:
+
+* `create_queue`               - Creates a Queue for instances where one is not already set up. Accessible at {store module name}.Queue
+* `announce`                   - Register a what events to announce and what modules to send the event. By default will use {store}.Queue
 
 ```elixir
 defmodule PersonStore do
   use EctoSchemaStore, schema: Person, repo: MyApp.Repo
 
-  on(:after_delete, model) do
-    IO.inspect "Delete #{schema} id: #{model.id}"
-  end
+  create_queue
 
-  on([:after_insert, :after_update], model) do
-    IO.inspect "Changed #{schema} id: #{model.id}"
-  end
+  announce events: [:after_delete, :after_update]
+end
+
+defmodule PersonEventHandler do
+  use EventQueues, type: :handler, subscribe: PersonStore.Queue
+
+   def handle(%{category: Person, name: :after_delete, data: data}) do
+    IO.inspect "Delete #{data.schema} id: #{data.id}"
+   end
+   def handle(%{category: Person, name: :after_update, data: data}) do
+    IO.inspect "Changed #{data.schema} id: #{data.id}"
+   end
+   def handle(_), do: nil
+end
+```
+
+A store can also use existing queues (1 or more):
+
+```elixir
+defmodule Queue1 do
+  use EventQueues, type: :queue
+end
+
+defmodule Queue2 do
+  use EventQueues, type: :queue
+end
+
+defmodule PersonStore do
+  use EctoSchemaStore, schema: Person, repo: MyApp.Repo
+
+  announce events: [:after_delete, :after_update],
+           queues: [Queue1, Queue2]
+end
+
+defmodule PersonDeleteEventHandler do
+  use EventQueues, type: :handler, subscribe: Queue1
+
+   def handle(%{category: Person, name: :after_delete, data: data}) do
+    IO.inspect "Delete #{data.schema} id: #{data.id}"
+   end
+   def handle(_), do: nil
+end
+
+defmodule PersonUpdateEventHandler do
+  use EventQueues, type: :handler, subscribe: Queue2
+
+   def handle(%{category: Person, name: :after_update, data: data}) do
+    IO.inspect "Changed #{data.schema} id: #{data.id}"
+   end
+   def handle(_), do: nil
+end
+```
+
+For certain events, actions can be taken before the action is to take place. In order to continue, an event must be resubmitted
+after handling the initial event to tell the Store to continue or cancel the action originally submitted.
+
+```elixir
+defmodule PersonStore do
+  use EctoSchemaStore, schema: Person, repo: MyApp.Repo
+
+  create_queue
+
+  announce events: [:before_update]
+end
+
+defmodule PersonEventHandler do
+  use EventQueues, type: :handler, subscribe: PersonStore.Queue
+
+   def handle(%{category: Person, name: :before_update} = event) do
+    # Perform some action
+
+    if success do
+      PersonStore.continue event
+    else
+      PersonStore.cancel event
+    end
+
+    # The event must be continued or canceled, otherwise an error will be returned back to
+    # the original function calling the store. Even if the operation was successful.
+   end
+   def handle(_), do: nil
 end
 ```
