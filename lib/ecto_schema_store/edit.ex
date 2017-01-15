@@ -61,7 +61,16 @@ defmodule EctoSchemaStore.Edit do
               error
             end
           {:ok, model} = result ->
-            on_after_insert(model)
+            if has_after_insert?() do
+              event = EctoSchemaStore.Event.Builder.new current_action: :after_insert,
+                                                        previous_model: default_value,
+                                                        new_model: model,
+                                                        changeset: change,
+                                                        store: __MODULE__
+
+              on_after_insert event
+            end
+
             {:ok, model}
         end
       end
@@ -131,6 +140,8 @@ defmodule EctoSchemaStore.Edit do
             Ecto.Changeset.change(model, params)
           end
 
+        input_model = model
+
         case repo.update change do
           {:error, changeset} = error ->
             if errors_to_map do
@@ -139,7 +150,16 @@ defmodule EctoSchemaStore.Edit do
               error
             end
           {:ok, model} = result ->
-            on_after_update(model)
+            if has_after_update?() do
+              event = EctoSchemaStore.Event.Builder.new current_action: :after_update,
+                                                        previous_model: input_model,
+                                                        new_model: model,
+                                                        changeset: change,
+                                                        store: __MODULE__
+
+              on_after_update event
+            end
+
             {:ok, model}
         end
       end
@@ -281,7 +301,16 @@ defmodule EctoSchemaStore.Edit do
         case repo.delete model do
           {:error, _} = error -> error
           {:ok, model} = result ->
-            on_after_delete(model)
+            if has_after_delete?() do
+              event = EctoSchemaStore.Event.Builder.new current_action: :after_delete,
+                                                        previous_model: model,
+                                                        new_model: nil,
+                                                        changeset: nil,
+                                                        store: __MODULE__
+
+              on_after_delete event
+            end
+
             {:ok, model}
         end
       end
