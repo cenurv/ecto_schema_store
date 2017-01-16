@@ -146,6 +146,8 @@ Options:
 
 * `changeset`                    - Provide and atom, or function reference for the changeset to use. Default `:changeset`
 * `errors_to_map`                - If an error occurs, the changeset error is converted to a JSON encoding firendly map. When given an atom, sets the root id to the atom. Default: `false`
+* `timeout`                      - Number of milliseconds to wait before returning when a :before_* event is being sent and processed. Default: 5000
+* `sync`                         - Should the operation wait for a :before_* event to be complete before returning. If not, then an :ok will be return and the action will be asynchronous. Default: true
 
 Sample Usage:
 
@@ -458,9 +460,9 @@ defmodule PersonEventHandler do
     # Perform some action
 
     if success do
-      PersonStore.continue event
+      event.data.originator.continue event
     else
-      PersonStore.cancel event
+      event.data.originator.cancel event, "Something failed"
     end
 
     # The event must be continued or canceled, otherwise an error will be returned back to

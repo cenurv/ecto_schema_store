@@ -13,6 +13,7 @@ defmodule EctoSchemaStore.Event do
       current_action = Keyword.get fields, :current_action, nil
       store = Keyword.get fields, :store, nil
       options = Keyword.get fields, :options, []
+      params = Keyword.get fields, :params, nil
 
       Event.new category: store.schema(),
                 name: current_action,
@@ -21,7 +22,8 @@ defmodule EctoSchemaStore.Event do
                   current: new_model,
                   changeset: changeset,
                   originator: store,
-                  options: options
+                  options: options,
+                  params: params
                 }
     end
   end
@@ -81,10 +83,12 @@ defmodule EctoSchemaStore.Event do
         name = String.to_atom "on_#{event}"
         has_name = String.to_atom "has_#{event}?"
 
-        for queue <- queues do
-          quote do
-            def unquote(has_name)(), do: true
-            def unquote(name)(event), do: unquote(queue).announce event
+        quote do
+          def unquote(has_name)(), do: true
+          def unquote(name)(event) do
+            for queue <- unquote(queues) do
+              queue.announce event
+            end
           end
         end
       end
