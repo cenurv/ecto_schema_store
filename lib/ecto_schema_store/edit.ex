@@ -73,7 +73,7 @@ defmodule EctoSchemaStore.Edit do
             end
           {:ok, model} = result ->
             if has_after_insert?() do
-              event = EctoSchemaStore.Event.Builder.new current_action: :after_insert,
+              event = EctoSchemaStore.Event.new current_action: :after_insert,
                                                         previous_model: default_value,
                                                         new_model: model,
                                                         changeset: change,
@@ -104,7 +104,7 @@ defmodule EctoSchemaStore.Edit do
           {:error, _} = error -> error
           {:ok, current} = result ->
             if has_after_insert?() do
-              event = EctoSchemaStore.Event.Builder.new current_action: :after_insert,
+              event = EctoSchemaStore.Event.new current_action: :after_insert,
                                                         previous_model: model,
                                                         new_model: current,
                                                         store: __MODULE__
@@ -127,7 +127,7 @@ defmodule EctoSchemaStore.Edit do
         params = alias_filters(params)
 
         if has_before_insert?() do
-          event = EctoSchemaStore.Event.Builder.new current_action: :before_insert,
+          event = EctoSchemaStore.Event.new current_action: :before_insert,
                                                     previous_model: default_value,
                                                     new_model: nil,
                                                     store: __MODULE__,
@@ -206,7 +206,7 @@ defmodule EctoSchemaStore.Edit do
             end
           {:ok, model} = result ->
             if has_after_update?() do
-              event = EctoSchemaStore.Event.Builder.new current_action: :after_update,
+              event = EctoSchemaStore.Event.new current_action: :after_update,
                                                         previous_model: input_model,
                                                         new_model: model,
                                                         changeset: change,
@@ -248,7 +248,7 @@ defmodule EctoSchemaStore.Edit do
           end
 
         if has_before_update?() do
-          event = EctoSchemaStore.Event.Builder.new current_action: :before_update,
+          event = EctoSchemaStore.Event.new current_action: :before_update,
                                                     previous_model: model,
                                                     new_model: nil,
                                                     store: __MODULE__,
@@ -399,7 +399,7 @@ defmodule EctoSchemaStore.Edit do
           {:error, _} = error -> error
           {:ok, model} = result ->
             if has_after_delete?() do
-              event = EctoSchemaStore.Event.Builder.new current_action: :after_delete,
+              event = EctoSchemaStore.Event.new current_action: :after_delete,
                                                         previous_model: model,
                                                         new_model: nil,
                                                         changeset: nil,
@@ -433,7 +433,7 @@ defmodule EctoSchemaStore.Edit do
           end
 
         if has_before_delete?() do
-          event = EctoSchemaStore.Event.Builder.new current_action: :before_delete,
+          event = EctoSchemaStore.Event.new current_action: :before_delete,
                                                     previous_model: model,
                                                     store: __MODULE__,
                                                     options: opts

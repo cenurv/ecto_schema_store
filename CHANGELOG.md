@@ -1,6 +1,13 @@
 # Change Log #
 
+## 1.8.0 ##
+
+* Adds more advanced event notifications through the EventQueues libary.
+* Add option to map to use only none association fields.
+* Adds provider support when using the auto_api library.
+
 ## 1.7.1 ##
+
 * Added Parser for common changeset errors.
 
 ## 1.7.0 ##
