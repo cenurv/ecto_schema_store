@@ -408,7 +408,7 @@ defmodule EctoSchemaStore.Edit do
               on_after_delete event
             end
 
-            {:ok, model}
+            result
         end
       end
 
@@ -420,8 +420,8 @@ defmodule EctoSchemaStore.Edit do
       * `timeout`          - Number of milliseconds to wait before returning when a :before_* event is being sent and processed. Default: 5000
       * `sync`             - Should the operation wait for a :before_* event to be complete before returning. If not, then an :ok will be return and the action will be asynchronous. Default: true
       """
-      def delete(id_or_model) do
-        opts = default_edit_options()
+      def delete(id_or_model, opts \\ []) do
+        opts = Keyword.merge default_edit_options(), opts
         timeout = Keyword.get opts, :timeout
         sync = Keyword.get opts, :sync
 
@@ -457,8 +457,8 @@ defmodule EctoSchemaStore.Edit do
       @doc """
       Like `delete` but throws and error instead of returning a tuple.
       """
-      def delete!(model_or_id) do
-        case delete model_or_id do
+      def delete!(model_or_id, opts \\ []) do
+        case delete model_or_id, opts do
           {:error, reason} -> throw reason
           {:ok, result} -> result
         end
