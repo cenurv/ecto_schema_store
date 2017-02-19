@@ -96,17 +96,17 @@ defmodule EctoSchemaStore.ApiProvider do
           |> assign(:parent, parent)
           |> assign(:current, current)
         else
-          conn |> send_errors("Not Found") |> Plug.Conn.halt
+          conn |> send_errors(404, "Not Found") |> Plug.Conn.halt
         end
       end
 
       def show(%Plug.Conn{assigns: %{current: model}} = conn) do
         case conn.assigns.current do
-          nil -> send_errors conn, "Not Found"
+          nil -> send_errors conn, 404, "Not Found"
           model -> send_resource conn, whitelist(unquote(store).to_map(model))
         end
       end
-      def show(conn), do: send_errors conn, "Not Found"
+      def show(conn), do: send_errors conn, 404, "Not Found"
 
       def index(conn) do
         records = fetch_all conn
@@ -129,7 +129,7 @@ defmodule EctoSchemaStore.ApiProvider do
         response = unquote(store).insert params, changeset: changeset, errors_to_map: singular_name()
 
         case response do
-          {:error, message} -> send_errors conn, message
+          {:error, message} -> send_errors conn, 400, message
           {:ok, record} -> send_resource conn, whitelist(unquote(store).to_map(record))
         end
       end
@@ -138,13 +138,13 @@ defmodule EctoSchemaStore.ApiProvider do
         current = assigns[:current]
 
         case current do
-          nil -> send_errors conn, "Not Found"
+          nil -> send_errors conn, 404, "Not Found"
           model ->
             changeset = __use_changeset__ conn, :update
             response = unquote(store).update model, conn.body_params, changeset: changeset, errors_to_map: singular_name()
 
             case response do
-              {:error, message} -> send_errors conn, message
+              {:error, message} -> send_errors conn, 400, message
               {:ok, record} -> send_resource conn, whitelist(unquote(store).to_map(record))
             end
         end
@@ -154,14 +154,14 @@ defmodule EctoSchemaStore.ApiProvider do
         current = assigns[:current]
 
         case current do
-          nil -> send_errors conn, "Not Found"
+          nil -> send_errors conn, 404, "Not Found"
           model ->
             if has_field?(unquote(soft_delete_field)) do
               current = assigns[:current]
               response = unquote(store).update_fields(current, Keyword.put([], unquote(soft_delete_field), unquote(soft_delete_value)), errors_to_map: singular_name())
 
               case response do
-                  {:error, message} -> send_errors conn, message
+                  {:error, message} -> send_errors conn, 400, message
                   {:ok, record} -> send_resource conn, nil
               end
             else
