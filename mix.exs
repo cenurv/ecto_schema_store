@@ -45,6 +45,7 @@ defmodule EctoStore.Mixfile do
     [{:ecto, "~> 2.0"},
      {:ex_doc, "~> 0.14", only: [:docs, :dev]},
      {:gettext, "~> 0.13"},
-     {:event_queues, "~> 1.0", optional: true}]
+     {:event_queues, "~> 1.1", optional: true},
+     {:auto_api, path: "../auto_api"}]
   end
 end
