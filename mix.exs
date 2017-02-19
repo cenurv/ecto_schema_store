@@ -1,7 +1,7 @@
 defmodule EctoStore.Mixfile do
   use Mix.Project
 
-  @version "2.0.0"
+  @version "1.8.0"
 
   def project do
     [app: :ecto_schema_store,
@@ -46,6 +46,6 @@ defmodule EctoStore.Mixfile do
      {:ex_doc, "~> 0.14", only: [:docs, :dev]},
      {:gettext, "~> 0.13"},
      {:event_queues, "~> 1.1", optional: true},
-     {:auto_api, path: "../auto_api"}]
+     {:rest_api_builder, path: "../rest_api_builder"}]
   end
 end

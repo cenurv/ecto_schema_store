@@ -1,5 +1,5 @@
 defmodule EctoSchemaStore.ApiProvider do
-  use AutoApi.Provider
+  use RestApiBuilder.Provider
 
   defmacro generate(opts) do
     store = Keyword.get opts, :store, nil
