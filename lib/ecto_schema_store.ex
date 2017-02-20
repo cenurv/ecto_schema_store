@@ -11,6 +11,8 @@ defmodule EctoSchemaStore do
     repo = Keyword.get opts, :repo
 
     quote do
+      use EventQueues, type: :announcer
+
       import EctoSchemaStore
       require Logger
       require EctoSchemaStore.Fetch
@@ -24,12 +26,8 @@ defmodule EctoSchemaStore do
       alias unquote(repo), as: Repo
       alias Ecto.Query
 
-      if Code.ensure_compiled?(EventQueues) do
-        use EventQueues, type: :announcer
-        require EventQueues
-
-        EventQueues.defevents [:after_insert, :after_update, :after_delete, :before_insert, :before_update, :before_delete]
-      end
+      require EventQueues
+      EventQueues.defevents [:after_insert, :after_update, :after_delete, :before_insert, :before_update, :before_delete]
 
       @doc """
       Returns a reference to the schema module `#{unquote(schema)}`.
