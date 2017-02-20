@@ -1,5 +1,10 @@
 # Change Log #
 
+## 1.8.1 ##
+
+* Realized that including the module to support `rest_api_builder` directly in this library creates an unneccessary dependency which
+also includes references to dependencies used by Phoenix and other frameworks. API provider moved to its own library. `rest_api_builder_essp`.
+
 ## 1.8.0 ##
 
 * Adds more advanced event notifications through the EventQueues libary.
