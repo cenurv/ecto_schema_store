@@ -3,13 +3,15 @@
 Ecto Schema Store now implements an API resource provider for the `rest_api_builder` project. This provider allows a
 developer to back a rest service using a store provided by this library.
 
+[REST API Builder](https://hex.pm/packages/rest_api_builder)
+
 This works is still early access may be changed significantly as that the `rest_api_builder` library is still under
 initial development.
 
 This documentation will focus on the provider itself. To see more documentation for `rest_api_builder` please visit that
 project in Hex.
 
-# Set Up
+## Using
 
 ```elixir
 defmodule Customer do
@@ -41,12 +43,11 @@ end
 
 ```
 
-# Configuring the provider
+## Configuring the provider
 
 * `store`                    - The module that implements the store interface.
 * `parent_field`             - The field name of the parent schema id in the Ecto schema definition. This is used when a REST API module is a child to another.
-* `soft_delete`              - By default the provider will delete the record. This takes a tuple of `{field_name, value_to_set}`.
-                               When set, will update the record and exclude it from future query results.
+* `soft_delete`              - By default the provider will delete the record. This takes a tuple of `{field_name, value_to_set}`. When set, will update the record and exclude it from future query results.
 * `include`                  - Which fields to include in the resource. By default only, non-association fields are included.
 * `exclude`                  - Which fields that woudl normally be included need to be excluded from the resource output.
 * `preload`                  - List of associations to preload when querying records. Dependent on need, child associations may be better as their own REST API module.
