@@ -1,7 +1,7 @@
 defmodule EctoStore.Mixfile do
   use Mix.Project
 
-  @version "1.7.1"
+  @version "1.8.0"
 
   def project do
     [app: :ecto_schema_store,
@@ -22,7 +22,7 @@ defmodule EctoStore.Mixfile do
      docs: [source_ref: "v#{@version}", main: "readme",
             canonical: "http://hexdocs.pm/ecto_schema_store",
             source_url: "https://github.com/cenurv/ecto_schema_store",
-            extras: ["CHANGELOG.md", "README.md"]]]
+            extras: ["CHANGELOG.md", "README.md", "API_PROVIDER.md"]]]
   end
 
   # Configuration for the OTP application
@@ -44,6 +44,8 @@ defmodule EctoStore.Mixfile do
   defp deps do
     [{:ecto, "~> 2.0"},
      {:ex_doc, "~> 0.14", only: [:docs, :dev]},
-     {:gettext, "~> 0.13"}]
+     {:gettext, "~> 0.13"},
+     {:event_queues, "~> 1.1"},
+     {:rest_api_builder, "~> 0.5"}]
   end
 end

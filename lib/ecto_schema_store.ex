@@ -16,15 +16,18 @@ defmodule EctoSchemaStore do
       require EctoSchemaStore.Fetch
       require EctoSchemaStore.BuildQueries
       require EctoSchemaStore.Edit
-      require EctoSchemaStore.Event
       require EctoSchemaStore.Factory
-      import EctoSchemaStore.Event, only: [on: 3]
       import EctoSchemaStore.Alias
       import Ecto.Changeset
       import Ecto.Query, except: [update: 3, update: 2]
       import EctoSchemaStore.Factory
       alias unquote(repo), as: Repo
       alias Ecto.Query
+
+      use EventQueues, type: :announcer
+      require EventQueues
+
+      EventQueues.defevents [:after_insert, :after_update, :after_delete, :before_insert, :before_update, :before_delete]
 
       @doc """
       Returns a reference to the schema module `#{unquote(schema)}`.
@@ -35,7 +38,6 @@ defmodule EctoSchemaStore do
       """
       def repo, do: unquote(repo)
 
-      EctoSchemaStore.Event.build
       EctoSchemaStore.Alias.build
       EctoSchemaStore.BuildQueries.build(unquote(schema))
       EctoSchemaStore.Fetch.build(unquote(schema), unquote(repo))

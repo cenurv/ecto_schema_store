@@ -146,6 +146,8 @@ Options:
 
 * `changeset`                    - Provide and atom, or function reference for the changeset to use. Default `:changeset`
 * `errors_to_map`                - If an error occurs, the changeset error is converted to a JSON encoding firendly map. When given an atom, sets the root id to the atom. Default: `false`
+* `timeout`                      - Number of milliseconds to wait before returning when a :before_* event is being sent and processed. Default: 5000
+* `sync`                         - Should the operation wait for a :before_* event to be complete before returning. If not, then an :ok will be return and the action will be asynchronous. Default: true
 
 Sample Usage:
 
@@ -360,26 +362,112 @@ end
 %Person{name: "Karen", email: "karen@nowhere.test"} = PersonStore.generate! [:bob, :karen], email: "karen@nowhere.test"
 ```
 
-## Edit Events ##
+## Event Announcements ##
 
-A store supports the concept of an event after an edit action is successful in the Ecto repo.
+A store supports the concept of an event through the [Event Queues](https://hex.pm/packages/event_queues) library on Hex.
+Event Queues must be included in your application and each queue and handler added to your application supervisor. Visit
+the instructions at (https://hexdocs.pm/event_queues) for more details.
 
 Events:
 
+* `:before_insert`
+* `:before_update`
+* `:before_delete`
 * `:after_insert`
 * `:after_update`
 * `:after_delete`
+
+Macros:
+
+* `create_queue`               - Creates a Queue for instances where one is not already set up. Accessible at {store module name}.Queue
+* `announces`                   - Register a what events to announce and what modules to send the event. By default will use {store}.Queue
 
 ```elixir
 defmodule PersonStore do
   use EctoSchemaStore, schema: Person, repo: MyApp.Repo
 
-  on(:after_delete, model) do
-    IO.inspect "Delete #{schema} id: #{model.id}"
-  end
+  create_queue
 
-  on([:after_insert, :after_update], model) do
-    IO.inspect "Changed #{schema} id: #{model.id}"
-  end
+  announces events: [:after_delete, :after_update]
+end
+
+defmodule PersonEventHandler do
+  use EventQueues, type: :handler, subscribe: PersonStore.Queue
+
+   def handle(%{category: Person, name: :after_delete, data: data}) do
+    IO.inspect "Delete #{data.schema} id: #{data.id}"
+   end
+   def handle(%{category: Person, name: :after_update, data: data}) do
+    IO.inspect "Changed #{data.schema} id: #{data.id}"
+   end
+   def handle(_), do: nil
+end
+```
+
+A store can also use existing queues (1 or more):
+
+```elixir
+defmodule Queue1 do
+  use EventQueues, type: :queue
+end
+
+defmodule Queue2 do
+  use EventQueues, type: :queue
+end
+
+defmodule PersonStore do
+  use EctoSchemaStore, schema: Person, repo: MyApp.Repo
+
+  announces events: [:after_delete, :after_update],
+           queues: [Queue1, Queue2]
+end
+
+defmodule PersonDeleteEventHandler do
+  use EventQueues, type: :handler, subscribe: Queue1
+
+   def handle(%{category: Person, name: :after_delete, data: data}) do
+    IO.inspect "Delete #{data.schema} id: #{data.id}"
+   end
+   def handle(_), do: nil
+end
+
+defmodule PersonUpdateEventHandler do
+  use EventQueues, type: :handler, subscribe: Queue2
+
+   def handle(%{category: Person, name: :after_update, data: data}) do
+    IO.inspect "Changed #{data.schema} id: #{data.id}"
+   end
+   def handle(_), do: nil
+end
+```
+
+For certain events, actions can be taken before the action is to take place. In order to continue, an event must be resubmitted
+after handling the initial event to tell the Store to continue or cancel the action originally submitted.
+
+```elixir
+defmodule PersonStore do
+  use EctoSchemaStore, schema: Person, repo: MyApp.Repo
+
+  create_queue
+
+  announces events: [:before_update]
+end
+
+defmodule PersonEventHandler do
+  use EventQueues, type: :handler, subscribe: PersonStore.Queue
+
+   def handle(%{category: Person, name: :before_update} = event) do
+    # Perform some action
+
+    if success do
+      event.data.originator.continue event
+    else
+      event.data.originator.cancel event, "Something failed"
+    end
+
+    # The event must be continued or canceled, otherwise an error will be returned back to
+    # the original function calling the store. Even if the operation was successful.
+   end
+   def handle(_), do: nil
 end
 ```

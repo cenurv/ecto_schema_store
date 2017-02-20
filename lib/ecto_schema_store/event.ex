@@ -1,37 +1,26 @@
 defmodule EctoSchemaStore.Event do
   @moduledoc false
 
-  defmacro build do
-    all_events = [:after_insert, :after_update, :after_delete]
+  alias EventQueues.Event
 
-    for event <- all_events do
-      name = String.to_atom "on_#{event}"
-      override = Keyword.put [], name, 1
+  def new(fields) do
+    previous_model = Keyword.get fields, :previous_model, nil
+    new_model = Keyword.get fields, :new_model, nil
+    changeset = Keyword.get fields, :changeset, nil
+    current_action = Keyword.get fields, :current_action, nil
+    store = Keyword.get fields, :store, nil
+    options = Keyword.get fields, :options, []
+    params = Keyword.get fields, :params, nil
 
-      quote do
-        def unquote(name)(_), do: nil
-
-        defoverridable unquote(override)
-      end
-    end
-  end
-
-  defmacro on(events, matching, do: block) when is_list events do
-    for event <- events do
-      name = String.to_atom "on_#{event}"
-
-      quote do
-        defp unquote(name)(unquote(matching)) do
-          unquote(block)
-        end
-      end
-    end
-  end
-  defmacro on(event, matching, do: block) when is_atom event do
-    quote do
-      on([unquote(event)], unquote(matching)) do
-        unquote(block)
-      end
-    end
+    Event.new category: store.schema(),
+              name: current_action,
+              data: %{
+                previous: previous_model,
+                current: new_model,
+                changeset: changeset,
+                originator: store,
+                options: options,
+                params: params
+              }
   end
 end
