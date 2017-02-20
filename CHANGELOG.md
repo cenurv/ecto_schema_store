@@ -3,7 +3,6 @@
 ## 1.8.0 ##
 
 * Adds more advanced event notifications through the EventQueues libary.
-* Add option to map to use only none association fields.
 * Adds provider support when using the `rest_api_builder` library.
 
 ## 1.7.1 ##
