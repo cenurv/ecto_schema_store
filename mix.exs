@@ -22,7 +22,7 @@ defmodule EctoStore.Mixfile do
      docs: [source_ref: "v#{@version}", main: "readme",
             canonical: "http://hexdocs.pm/ecto_schema_store",
             source_url: "https://github.com/cenurv/ecto_schema_store",
-            extras: ["CHANGELOG.md", "README.md", "API_PROVIDER.md"]]]
+            extras: ["CHANGELOG.md", "README.md"]]]
   end
 
   # Configuration for the OTP application
