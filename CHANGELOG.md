@@ -1,5 +1,9 @@
 # Change Log #
 
+## 1.8.2 ##
+
+* Order by was overwritting the entire query, fixed expression to build on previous query parameters.
+
 ## 1.8.1 ##
 
 * Realized that including the module to support `rest_api_builder` directly in this library creates an unneccessary dependency which

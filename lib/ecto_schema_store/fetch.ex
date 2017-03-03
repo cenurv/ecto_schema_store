@@ -22,7 +22,7 @@ defmodule EctoSchemaStore.Fetch do
         __order_by__ query, [order_list]
       end
       defp __order_by__(query, order_list) do
-        from m in schema(),
+        from m in query,
         order_by: ^order_list
       end
 
