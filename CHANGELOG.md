@@ -1,5 +1,9 @@
 # Change Log #
 
+## 1.9.0 ##
+
+* Optimized query builder to utilize dynamic field names in Ecto queries. This will reduce compile time and generated beam size.
+
 ## 1.8.2 ##
 
 * Order by was overwritting the entire query, fixed expression to build on previous query parameters.
