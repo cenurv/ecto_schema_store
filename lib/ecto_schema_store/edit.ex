@@ -22,7 +22,7 @@ defmodule EctoSchemaStore.Edit do
       def continue(%EventQueues.Event{} = event) do
         sync = Keyword.get event.data.options, :sync, false
 
-        response = 
+        response =
           case event.name do
             :before_insert -> execute_insert event.data.previous, event.data.params, event.data.options
             :before_update -> execute_update event.data.previous, event.data.params, event.data.options
@@ -57,7 +57,7 @@ defmodule EctoSchemaStore.Edit do
 
         repo = unquote(repo)
 
-        change = 
+        change =
           if changeset do
             run_changeset default_value, params, changeset
           else
@@ -83,7 +83,7 @@ defmodule EctoSchemaStore.Edit do
             end
 
             {:ok, model}
-        end        
+        end
       end
 
       @doc """
@@ -188,7 +188,7 @@ defmodule EctoSchemaStore.Edit do
 
         repo = unquote(repo)
 
-        change = 
+        change =
           if changeset do
             run_changeset model, params, changeset
           else
@@ -230,10 +230,23 @@ defmodule EctoSchemaStore.Edit do
       * `sync`             - Should the operation wait for a :before_* event to be complete before returning. If not, then an :ok will be return and the action will be asynchronous. Default: true
       """
       def update(id_or_model, params, opts \\ [])
+      def update(id_or_model, params, opts) when is_list id_or_model do
+        # id_or_model is a query keyword list.
+        update Enum.into(id_or_model, %{}), params, opts
+      end
       def update(id_or_model, params, opts) when is_list params do
         update id_or_model, Enum.into(params, %{}), opts
       end
       def update(id_or_model, params, opts) do
+        id_or_model =
+          if is_map(id_or_model) and not Map.has_key?(id_or_model, :__struct__) do
+            # incoming map is a query because it is not a schema struct.
+            # query for the record to update
+            one(id_or_model)
+          else
+            id_or_model
+          end
+
         opts = Keyword.merge default_edit_options(), opts
         timeout = Keyword.get opts, :timeout
         sync = Keyword.get opts, :sync
@@ -353,7 +366,7 @@ defmodule EctoSchemaStore.Edit do
       not update autogenerate field. However, if :updated_at is present, the value will be
       passed a new Ecto.NaiveDateTime value. Changeset will not be applied.
       Use with caution. Query params will be processed like `all` or `one`.
-      
+
       Currently not documented, experimental addition. This may be better set up in the
       individual store using the following code:
 

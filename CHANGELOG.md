@@ -1,5 +1,9 @@
 # Change Log #
 
+## 1.9.1 ##
+
+* Added the ability to add a query to the front of an update statement. This will only update the first record retrieved and not all records.
+
 ## 1.9.0 ##
 
 * Optimized query builder to utilize dynamic field names in Ecto queries. This will reduce compile time and generated beam size.

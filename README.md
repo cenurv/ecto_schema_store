@@ -165,8 +165,14 @@ bob = PersonStore.update! bob, email: "bob2@nowhere.test"
 PersonStore.update! 12, %{email: "bob2@nowhere.test"}
 PersonStore.delete 12
 
+# Update a single record based upon a query.
+# This will only update the first record retrieved by the database, it is not meant
+# to be an update_all style function. Instead it is useful if you use another id to reference
+# the record that is not the primary id.
+PersonStore.update %{name: "bob"}, email: "otheremail@nowhere.test"
+
 # Update or create
-attributes_to_update = 
+attributes_to_update =
 query = %{name: "Bob"}
 PersonStore.update_or_create attributes_to_update, query
 PersonStore.update_or_create! %{email: "new@nowhere.test"}, name: "Bob"
@@ -183,7 +189,7 @@ bob = PersonStore.insert! [name: "Bob", email: "bob@nowhere.test"], changeset: :
 bob = PersonStore.update! bob, %{email: "bob2@nowhere.test"}, changeset: :update_changeset
 bob = PersonStore.update! bob, [email: "bob2@nowhere.test"], changeset: :update_changeset
 bob = PersonStore.update! bob, %{email: "bob2@nowhere.test"}, changeset: :my_other_custom_changeset
-``` 
+```
 
 It is also possible to pass a function reference in as the changeset.
 
@@ -233,7 +239,7 @@ defmodule PersonStore do
   def get_all_ordered_by_name_using_ecto_directly do
     query = from p in schema,
             order_by: [p.name]
-    
+
     repo.all query
   end
 end
