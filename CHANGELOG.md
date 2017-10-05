@@ -1,5 +1,11 @@
 # Change Log #
 
+## 1.10.0 ##
+
+* Added support for like and ilike in the query builder.
+* Updated schema key listing utility to use built in Ecto `__schema__` reflection function. Will now filter out virtual types.
+* It has been a while since I last updated the Ecto dependency. It has now been updated to require 2.2 or greater.
+
 ## 1.9.1 ##
 
 * Added the ability to add a query to the front of an update statement. This will only update the first record retrieved and not all records.

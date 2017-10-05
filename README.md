@@ -113,7 +113,9 @@ Operators:
 * `{:<=, value}`            - The field is less than or equal the value.
 * `{:>, value}`             - The field is greater than the value.
 * `{:>=, value}`            - The field is greater than or equal the value.
-* `{:in, []}`               - the field is in the list of provided values.
+* `{:in, []}`               - The field is in the list of provided values.
+* `{:like, value}`          - The field performs a case sensitive like against the provided value.
+* `{:ilike, value}`         - The field performs a case insensitive like against the provided value.
 
 ```elixir
 PersonStore.all %{name: nil}

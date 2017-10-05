@@ -10,19 +10,14 @@ defmodule EctoSchemaStore.Utils do
   defp is_assoc(%Ecto.Association.NotLoaded{}), do: true
   defp is_assoc(_), do: false
 
-  def keys(schema, only_assocs \\ false) do
-    impl = struct schema
-    keys = Map.keys impl
-
-    ignore = [:__struct__, :__meta__]
-
-    Enum.filter keys, fn(key) ->
-      default_value = Map.get(impl, key)
-      if not only_assocs do
-        !is_assoc(default_value) and (key in ignore) == false
-      else
-        is_assoc(default_value) 
-      end
+  @doc """
+  Returns non-virtual or association field names.
+  """
+  def keys(schema, only_assocs \\ false)
+    if only_assocs do
+      schema.__schema__(:associations)
+    else
+      schema.__schema__(:fields)
     end
   end
 
@@ -59,7 +54,7 @@ defmodule EctoSchemaStore.Utils do
 
   @doc """
   Translate ecto changeset errors into human readable. This handles string interpolation
-  
+
   ## Examples
       iex> Utils.Services.ErrorService.translate_error({"can't be blank", []})
       "can't be blank"
@@ -102,6 +97,6 @@ defmodule EctoSchemaStore.Utils do
   def interpret_errors_from_list([h | t], name, acc, index) do
     error_output = interpret_errors(h, "#{name}[#{index}]", acc)
     interpret_errors_from_list(t, name, error_output, index + 1)
-  end  
+  end
 
 end

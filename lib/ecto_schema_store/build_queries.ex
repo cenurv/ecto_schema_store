@@ -1,6 +1,18 @@
 defmodule EctoSchemaStore.BuildQueries do
   @moduledoc false
 
+  defmacro build_ecto_query(query, :like, key) do
+    quote do
+      from q in unquote(query),
+      where: like(field(q, ^unquote(key)))
+    end
+  end
+  defmacro build_ecto_query(query, :ilike, key) do
+    quote do
+      from q in unquote(query),
+      where: ilike(field(q, ^unquote(key)))
+    end
+  end
   defmacro build_ecto_query(query, :is_nil, key) do
     quote do
       from q in unquote(query),
@@ -61,6 +73,12 @@ defmodule EctoSchemaStore.BuildQueries do
     assocs = EctoSchemaStore.Utils.keys(Macro.expand(schema, __CALLER__), true)
 
     quote do
+      defp build_keyword_query(query, field_name, {:like, value}) do
+        {:ok, EctoSchemaStore.BuildQueries.build_ecto_query(query, :like, field_name, ^value)}
+      end
+      defp build_keyword_query(query, field_name, {:ilike, value}) do
+        {:ok, EctoSchemaStore.BuildQueries.build_ecto_query(query, :ilike, field_name, ^value)}
+      end
       defp build_keyword_query(query, field_name, {:in, value}) do
         {:ok, EctoSchemaStore.BuildQueries.build_ecto_query(query, :in, field_name, ^value)}
       end
@@ -133,5 +151,5 @@ defmodule EctoSchemaStore.BuildQueries do
         end
       end
     end
-  end  
+  end
 end
