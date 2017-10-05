@@ -247,20 +247,22 @@ Since a store is just an ordinary module, you can add your actions and build off
 A store is provided the following custom internal API:
 
 * `build_query`       - Builds a `Ecto.Query` struct based upon the map params input.
+* `build_query!`      - Like `build_query` but throws an error.
+
 
 ```elixir
 defmodule PersonStore do
   use EctoSchemaStore, schema: Person, repo: MyApp.Repo
 
   def get_all_ordered_by_name do
-    build_query
+    build_query!
     |> order_by([:name])
     |> all
   end
 
   def find_by_email(email) do
     %{email: email}
-    |> build_query
+    |> build_query!
     |> order_by([:name])
     |> all
   end
