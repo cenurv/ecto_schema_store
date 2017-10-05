@@ -1,18 +1,6 @@
 defmodule EctoSchemaStore.BuildQueries do
   @moduledoc false
 
-  defmacro build_ecto_query(query, :like, key) do
-    quote do
-      from q in unquote(query),
-      where: like(field(q, ^unquote(key)))
-    end
-  end
-  defmacro build_ecto_query(query, :ilike, key) do
-    quote do
-      from q in unquote(query),
-      where: ilike(field(q, ^unquote(key)))
-    end
-  end
   defmacro build_ecto_query(query, :is_nil, key) do
     quote do
       from q in unquote(query),
@@ -23,6 +11,18 @@ defmodule EctoSchemaStore.BuildQueries do
     quote do
       from q in unquote(query),
       where: not is_nil(field(q, ^unquote(key)))
+    end
+  end
+  defmacro build_ecto_query(query, :like, key, value) do
+    quote do
+      from q in unquote(query),
+      where: like(field(q, ^unquote(key)), unquote(value))
+    end
+  end
+  defmacro build_ecto_query(query, :ilike, key, value) do
+    quote do
+      from q in unquote(query),
+      where: ilike(field(q, ^unquote(key)), unquote(value))
     end
   end
   defmacro build_ecto_query(query, :eq, key, value) do
