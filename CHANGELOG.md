@@ -1,10 +1,11 @@
 # Change Log #
 
-## 1.10.0 ##
+## 2.0.0 ##
 
-* Added support for like and ilike in the query builder.
+* Added support for `like` and `ilike` in the query builder. MySQL already does case insensitive and will not support `ilike`.
 * Updated schema key listing utility to use built in Ecto `__schema__` reflection function. Will now filter out virtual types.
-* It has been a while since I last updated the Ecto dependency. It has now been updated to require 2.2 or greater.
+* Lexical Atom queries have been soft deprecated. There doesn't seem to be a reason to support this any further as that it does not provide much(if any) benefit over the standard query keyword list or map. This feature will be removed in a future release.
+* It has been a while since I last updated the Ecto dependency. It has now been updated to require 2.2 or greater. This has resulted in a major version revision since this will force applications to move up to a newer version of Ecto.
 
 ## 1.9.1 ##
 

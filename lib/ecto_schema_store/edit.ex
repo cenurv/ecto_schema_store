@@ -360,34 +360,29 @@ defmodule EctoSchemaStore.Edit do
       end
 
       @doc """
-      ## Experimental ##
+      A update statement sent direct to the data store. Uses `Ecto.Repo.update_all`, will
+      not update autogenerate field. However, if :updated_at is present, the value will be
+      passed a new Ecto.NaiveDateTime value. Changeset will not be applied.
+      Use with caution.
+      """
+      def update_all(params) do
+        update_all params, []
+      end
 
+      @doc """
       A update statement sent direct to the data store. Uses `Ecto.Repo.update_all`, will
       not update autogenerate field. However, if :updated_at is present, the value will be
       passed a new Ecto.NaiveDateTime value. Changeset will not be applied.
       Use with caution. Query params will be processed like `all` or `one`.
 
-      Currently not documented, experimental addition. This may be better set up in the
-      individual store using the following code:
-
       ```elixir
-      def update_all(query: query_params, set: params) do
-        repo().update_all build_query!(query_params), [set: params]
-      end
+      PersonStore.update_all [name: "New Name"], [id: {:in, [7, 8, 9]}]
       ```
-
-      This can then be modified specifically to the use case and not applied to all Repos.
-      I may change my mind about this, so I would not reccommend making code dependent upon
-      this yet.
-
-      The biggest reasons for the hesitation is that `Ecto.Repo.update_all` basically just
-      submits as is to the database and may provide other options that will not be
-      supported here as that this is mean't to be a simplistic implementation.
       """
-      def update_all(query: query_params, set: params) when is_map params do
-        update_all query: query_params, set: Enum.into(params, [])
+      def update_all(params, query_params) when is_map params do
+        update_all Enum.into(params, []), query_params
       end
-      def update_all(query: query_params, set: params) do
+      def update_all(params, query_params) do
         keys = unquote(keys)
         params =
           if :updated_at in keys do
@@ -475,6 +470,20 @@ defmodule EctoSchemaStore.Edit do
           {:error, reason} -> throw reason
           {:ok, result} -> result
         end
+      end
+
+      @doc """
+      Deletes all records in a table.
+      """
+      def delete_all do
+        delete_all []
+      end
+
+      @doc """
+      Deletes all records in a table matching the provided query params.
+      """
+      def delete_all(query_params) do
+        repo().delete_all build_query!(query_params)
       end
     end
   end

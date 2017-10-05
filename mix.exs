@@ -1,12 +1,12 @@
 defmodule EctoStore.Mixfile do
   use Mix.Project
 
-  @version "1.9.1"
+  @version "2.0.0"
 
   def project do
     [app: :ecto_schema_store,
      version: @version,
-     elixir: "~> 1.3",
+     elixir: "~> 1.4",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      compilers: [:gettext] ++ Mix.compilers,

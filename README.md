@@ -183,7 +183,7 @@ PersonStore.update_or_create! %{email: "new@nowhere.test"}, name: "Bob"
 ## Changesets ##
 
 The `insert` and `update` functions by default use a changeset on the provided schema name `:changeset` for inserting and updating.
-This can be overridden and a specific changeset name provided.
+This can be overridden and a specific changeset name provided.¬
 
 ```elixir
 bob = PersonStore.insert! %{name: "Bob", email: "bob@nowhere.test"}, changeset: :insert_changeset
@@ -204,6 +204,33 @@ end
 
 insert [name: "Bob"], changeset: &my_changeset/2
 ```
+
+## Update/Delete All ##
+
+Ecto allows batch updates and deletes by passing changes directly to the database to effect multiple records.
+
+* `update_all`         - Set values based upon a provided query map/keyword list. If `updated_at` field present on schema, will update the date/time.
+* `delete_all`         - Delete all records that match the provided query map/keyword list.
+
+```elixir
+# Update records by query
+values_to_set = [name: "Generic Name"]
+query_params = [email: {:like, "%@test.dev"}]
+
+PersonStore.update_all values_to_set, query_params
+
+# Update all records
+PersonStore.update_all name: "Generic Name"
+
+# Delete records by query
+query_params = [email: {:like, "%@test.dev"}]
+
+PersonStore.delete_all query_params
+
+# Delete All Records on a Table
+PersonStore.delete_all
+```
+
 
 ## References ##
 
@@ -277,28 +304,6 @@ only one will be used.
 
 ```elixir
 PersonStore.insert! %{"name" => "Bob", email: "bob2@nowhere.test"}
-```
-
-## Lexical Atom Query ##
-
-The store provides a function for taking a lexical query atom with a list of values and
-returning the results. Currently only supports `_and_` clauses.
-
-Functions:
-
-* `get_all_by`              - Return all results. Equivalent to using the `all` function.
-* `get_by`                  - Return a single result. Equivalent to using the `one` function.
-
-```elixir
-# Regular
-PersonStore.all %{name: "Bob", email: "bob@nowhere.test"}
-# Lexical Atom
-PersonStore.get_all_by :name_and_email, ["Bob", "bob@nowhere.test"]
-
-# Regular
-PersonStore.one %{name: "Bob", email: "bob@nowhere.test"}
-# Lexical Atom
-PersonStore.get_by :name_and_email, ["Bob", "bob@nowhere.test"]
 ```
 
 ## Generator Factories ##
