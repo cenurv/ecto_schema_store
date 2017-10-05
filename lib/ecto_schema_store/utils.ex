@@ -7,13 +7,10 @@ defmodule EctoSchemaStore.Utils do
     end
   end
 
-  defp is_assoc(%Ecto.Association.NotLoaded{}), do: true
-  defp is_assoc(_), do: false
-
   @doc """
   Returns non-virtual or association field names.
   """
-  def keys(schema, only_assocs \\ false)
+  def keys(schema, only_assocs \\ false) do
     if only_assocs do
       schema.__schema__(:associations)
     else
