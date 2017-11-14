@@ -317,6 +317,48 @@ defmodule EctoSchemaStore.Edit do
       end
 
       @doc """
+      Find a record if it exists, or create and return the new record.
+      """
+      def find_or_create(attributes, query, opts \\ []) do
+        case one(query) do
+          nil -> insert(attributes, opts)
+          record -> {:ok, record}
+        end
+      end
+
+      @doc """
+      Like `find_or_create` but throws and error instead of returning a tuple.
+      """
+      def find_or_create!(attributes, query, opts \\ []) do
+        case one(query) do
+          nil -> insert_fields!(attributes, opts)
+          record -> record
+        end
+      end
+
+      @doc """
+      Find a record if it exists, or create and return the new record.
+      If not the record is created without passing through a
+      changeset.
+      """
+      def find_or_create_fields(attributes, query) do
+        case one(query) do
+          nil -> insert_fields attributes
+          record -> {:ok, record}
+        end
+      end
+
+      @doc """
+      Like `find_or_create_fields` but throws and error instead of returning a tuple.
+      """
+      def find_or_create_fields!(attributes, query) do
+        case one(query) do
+          nil -> insert_fields! attributes
+          record -> record
+        end
+      end
+
+      @doc """
       Queries for the provided query parameters and updates the record if it is
       found. If not the record is created.
       """

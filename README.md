@@ -141,6 +141,10 @@ The following functions are provided in a store for editing data.
 * `update_or_create!`            - Same as `update_or_create` but throws an error instead of returning a tuple.
 * `update_or_create_fields`      - Updates a record if the provided query values are found. Otherwise creates the record. Does not use a changeset.
 * `update_or_create_fields!`     - Same as `update_or_create_fields` but throws an error instead of returning a tuple.
+* `find_or_create`               - Returns the record if it already exists. Otherwise creates the record.
+* `find_or_create!`              - Same as `find_or_create` but throws an error instead of returning a tuple.
+* `find_or_create_fields`        - Returns the record if it already exists. Otherwise creates the record. Does not use a changeset.
+* `find_or_create_fields!`       - Same as `find_or_create_fields` but throws an error instead of returning a tuple.
 * `delete`                       - Delete a record.
 * `delete!`                      - Same as `delete` but throws an error instead of returning a tuple.
 
