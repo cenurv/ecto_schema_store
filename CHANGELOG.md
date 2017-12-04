@@ -1,6 +1,16 @@
 # Change Log #
 
+## 2.1.1 ##
+
+* Fixed `preload` option in `all` and `one` functional calls to allow any Ecto supported input like `preload_assocs`. These now invoke the same function.
+* Added `order_preload_by` convienence function to create a sortable preload query. This function supports any input the Ecto Repo `order_by` function accepts.
+
+```elixir
+PersonStore.all [name: "Bob"], preload: [relation_field: PersonStore.order_preload_by(:id)]
+```
+
 ## 2.1.0 ##
+
 * Added support for `find_or_create` functions on a store.
 
 ## 2.0.0 ##

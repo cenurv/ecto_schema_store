@@ -3,16 +3,7 @@ defmodule EctoSchemaStore.Fetch do
 
   defmacro build(schema, repo) do
     quote do
-      defp __preload__(model, []), do: model
-      defp __preload__(model, preload) when is_list preload do
-        Enum.reduce preload, model, fn(key, acc) -> unquote(repo).preload(acc, key) end
-      end
-      defp __preload__(model, :all) do
-        __preload__ model, schema_associations()
-      end
-      defp __preload__(model, preload) when is_atom preload do
-        __preload__ model, [preload]
-      end
+      defp __preload__(model, preload), do: preload_assocs model, preload
 
       defp __to_map__(model, true), do: to_map(model)
       defp __to_map__(model, false), do: model
@@ -158,6 +149,24 @@ defmodule EctoSchemaStore.Fetch do
         unquote(repo).preload(record, fields)
       end
       def preload_assocs(record, field), do: preload_assocs(record, [field])
+
+      @doc """
+      Helper to order a preload by a provided Ecto repo order by value.
+
+      ```elixir
+      store.preload_assocs(model, [field: order_preload_by(:name)])
+      ```
+
+      The same as:
+
+      ```elixir
+      import Ecto.Query, only: [from: 2]
+      store.preload_assocs(model, [field: (from(s in Schema, order_by: s.name))])
+      ```
+      """
+      def order_preload_by(order_params) do
+        order_by build_query!(), ^order_params
+      end
 
       @doc """
       Returns true if any records match the provided query filters.
