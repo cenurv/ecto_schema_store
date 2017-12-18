@@ -1,5 +1,9 @@
 # Change Log #
 
+## 2.2.0 ##
+
+* Added `preconfigure` macro to stores to generate a quickly customized version of the insert and update functions.
+
 ## 2.1.1 ##
 
 * Fixed `preload` option in `all` and `one` functional calls to allow any Ecto supported input like `preload_assocs`. These now invoke the same function.

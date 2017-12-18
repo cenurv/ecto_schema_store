@@ -21,6 +21,7 @@ defmodule EctoSchemaStore do
       import Ecto.Changeset
       import Ecto.Query, except: [update: 3, update: 2]
       import EctoSchemaStore.Factory
+      import EctoSchemaStore.Assistant
       alias unquote(repo), as: Repo
       alias Ecto.Query
 

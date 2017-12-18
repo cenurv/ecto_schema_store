@@ -209,6 +209,44 @@ end
 insert [name: "Bob"], changeset: &my_changeset/2
 ```
 
+## Preconfigured Options ##
+
+Each of the insert and update functions takes a set of options. It may be inconvienent to set these options every
+time one of theses functions is used. A duplicate set of these funcitons can be generated with a predefined set
+of options.
+
+The `preconfigure` function will generate a customized variation of the following store functions:
+
+* `insert`
+* `insert!`
+* `insert_fields`
+* `insert_fields!`
+* `update`
+* `update!`
+* `update_fields`
+* `update_fields!`
+
+```elixir
+defmodule PersonStore do
+  use EctoSchemaStore, schema: Person, repo: MyApp.Repo
+
+  # (custom_name, options)
+  preconfigure :for_api, changeset: :my_changeset, errors_to_map: true
+end
+
+PersonStore.insert_for_api! name: "Bob", email: "bob@nowhere.test"
+PersonStore.insert_for_api! name: "Will", email: "will@nowhere.test"
+PersonStore.insert_for_api! name: "Carl", email: "carl@nowhere.test"
+PersonStore.insert_for_api! name: "Mike", email: "mike@nowhere.test"
+
+# Similar statements without preconfigure would have looked like this.
+PersonStore.insert! [name: "Bob", email: "bob@nowhere.test"], changeset: :my_changeset, errors_to_map: true
+PersonStore.insert! [name: "Will", email: "will@nowhere.test"], changeset: :my_changeset, errors_to_map: true
+PersonStore.insert! [name: "Carl", email: "carl@nowhere.test"], changeset: :my_changeset, errors_to_map: true
+PersonStore.insert! [name: "Mike", email: "mike@nowhere.test"], changeset: :my_changeset, errors_to_map: true
+
+```
+
 ## Update/Delete All ##
 
 Ecto allows batch updates and deletes by passing changes directly to the database to effect multiple records.
