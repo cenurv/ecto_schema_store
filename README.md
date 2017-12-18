@@ -244,7 +244,36 @@ PersonStore.insert! [name: "Bob", email: "bob@nowhere.test"], changeset: :my_cha
 PersonStore.insert! [name: "Will", email: "will@nowhere.test"], changeset: :my_changeset, errors_to_map: true
 PersonStore.insert! [name: "Carl", email: "carl@nowhere.test"], changeset: :my_changeset, errors_to_map: true
 PersonStore.insert! [name: "Mike", email: "mike@nowhere.test"], changeset: :my_changeset, errors_to_map: true
+```
 
+## Validate Insert/Update Params Only ##
+
+Sometimes it is convienent to check if a changeset will pass before actually attempting to insert or update
+a record. There are two validation functions that can be used to check the changesets the same way they would
+be checked on an insert or update action.
+
+* `validate_insert`           - Validate the params against a new instance of the schema.
+* `validate_update`           - Validate the params against an existing instance.
+
+Options:
+
+* `changeset`                    - Provide and atom, or function reference for the changeset to use. Default `:changeset`
+* `errors_to_map`                - If an error occurs, the changeset error is converted to a JSON encoding firendly map. When given an atom, sets the root id to the atom. Default: `false`
+
+```elixir
+# Checking an insert
+
+with :ok <- PersonStore.validate_insert(%{name: "Bob"}, changeset: :my_changeset, errors_to_map: :person) do
+  # Perform some action on validation, the :error tuple is return directly from the with statement.
+end
+
+# Chacking an update
+
+existing_record = Person.Store.insert_fields! name: "Will"
+
+with :ok <- PersonStore.validate_update(existing_record, %{name: "Bob"}, changeset: :my_changeset, errors_to_map: :person) do
+  # Perform some action on validation, the :error tuple is return directly from the with statement.
+end
 ```
 
 ## Update/Delete All ##

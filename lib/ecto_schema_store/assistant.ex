@@ -12,10 +12,12 @@ defmodule EctoSchemaStore.Assistant do
   * `insert!`
   * `insert_fields`
   * `insert_fields!`
+  * `validate_insert`
   * `update`
   * `update!`
   * `update_fields`
   * `update_fields!`
+  * `validate_update`
 
   If using the name `api` the follwing functions will be generate:
 
@@ -23,10 +25,12 @@ defmodule EctoSchemaStore.Assistant do
   * `insert_api!`
   * `insert_fields_api`
   * `insert_fields_api!`
+  * `validate_insert_api`
   * `update_api`
   * `update_api!`
   * `update_fields_api`
   * `update_fields_api!`
+  * `validate_update_api`
   """
   defmacro preconfigure(name, predefined_options \\ []) when is_atom(name) and is_list(predefined_options) do
     quote do
@@ -38,6 +42,7 @@ defmodule EctoSchemaStore.Assistant do
       preconfigure_update unquote(name), unquote(predefined_options), "_", "!"
       preconfigure_update unquote(name), unquote(predefined_options), "_fields_", ""
       preconfigure_update unquote(name), unquote(predefined_options), "_fields_", "!"
+      preconfigure_validate unquote(name), unquote(predefined_options)
     end
   end
 
@@ -69,7 +74,7 @@ defmodule EctoSchemaStore.Assistant do
       Using:
 
       ```elixir
-      preconfigure_insert :api, changeset: :mychangeset, errors_to_map: :my_record
+      preconfigure :api, changeset: :mychangeset, errors_to_map: :my_record
 
       # Basic Insert
       #{unquote(new_name)} name: "Sample"
@@ -113,7 +118,7 @@ defmodule EctoSchemaStore.Assistant do
       Using:
 
       ```elixir
-      preconfigure_update :api, changeset: :mychangeset, errors_to_map: :my_record
+      preconfigure :api, changeset: :mychangeset, errors_to_map: :my_record
 
       model = insert_api name: "Sample"
 
@@ -127,6 +132,63 @@ defmodule EctoSchemaStore.Assistant do
       def unquote(new_name)(schema_or_id, params, opts \\ []) do
         options = Keyword.merge unquote(predefined_options), opts
         unquote(callable)(schema_or_id, params, options)
+      end
+    end
+  end
+
+  defmacro preconfigure_validate(name, predefined_options \\ []) when is_atom(name) and is_list(predefined_options) do
+    update_name = String.to_atom("validate_update_#{name}")
+    insert_name = String.to_atom("validate_insert_#{name}")
+
+    quote do
+      @doc """
+      Checks update validation with the following predefined options:
+
+      ```elixir
+      #{unquote(inspect predefined_options)}
+      ```
+
+      Using:
+
+      ```elixir
+      preconfigure :api, changeset: :mychangeset, errors_to_map: :my_record
+
+      model = insert_api name: "Sample"
+
+      # Basic update validation
+      #{unquote(update_name)} model, name: "Sample2"
+
+      # Override predefined options validation
+      #{unquote(update_name)} model, [name: "Sample"], changeset: :otherchangeset
+      ```
+      """
+      def unquote(update_name)(schema_or_id, params, opts \\ []) do
+        options = Keyword.merge unquote(predefined_options), opts
+        validate_update(schema_or_id, params, options)
+      end
+
+      @doc """
+      Checks insert validation with the following predefined options:
+
+      ```elixir
+      #{unquote(inspect predefined_options)}
+      ```
+
+      Using:
+
+      ```elixir
+      preconfigure :api, changeset: :mychangeset, errors_to_map: :my_record
+
+      # Basic update validation
+      #{unquote(insert_name)} name: "Sample2"
+
+      # Override predefined options validation
+      #{unquote(insert_name)} [name: "Sample"], changeset: :otherchangeset
+      ```
+      """
+      def unquote(insert_name)(params, opts \\ []) do
+        options = Keyword.merge unquote(predefined_options), opts
+        validate_insert(params, options)
       end
     end
   end

@@ -1,5 +1,10 @@
 # Change Log #
 
+## 2.3.0 ##
+
+* Added `validate_insert` and `validate_update` functions to a store module. These can be used to check changeset validation
+before passing to actual insert or update functions.
+
 ## 2.2.0 ##
 
 * Added `preconfigure` macro to stores to generate a quickly customized version of the insert and update functions.
