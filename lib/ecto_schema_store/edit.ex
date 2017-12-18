@@ -17,6 +17,46 @@ defmodule EctoSchemaStore.Edit do
       end
 
       @doc """
+      Validates provided params against a new instance of the schema with the provided
+      changeset option. Returns `:ok` if successfully validated.
+
+      Options:
+
+      * `changeset`        - By default use :changeset on the schema otherwise use the provided changeset name.
+      * `errors_to_map`    - If an error occurs, the changeset error is converted to a JSON encoding firendly map. When given an atom, sets the root id to the atom. Default: `false`
+      """
+      def validate_insert(params, opts \\ []) do
+        default_value = struct unquote(schema), %{}
+        validate_update default_value, params, opts
+      end
+
+      @doc """
+      Validates provided params against a the passed instance of the schema with the provided
+      changeset option. Returns `:ok` if successfully validated.
+
+      Options:
+
+      * `changeset`        - By default use :changeset on the schema otherwise use the provided changeset name.
+      * `errors_to_map`    - If an error occurs, the changeset error is converted to a JSON encoding firendly map. When given an atom, sets the root id to the atom. Default: `false`
+      """
+      def validate_update(existing, params, opts \\ []) do
+        changeset = Keyword.get opts, :changeset, :changeset
+        errors_to_map = Keyword.get opts, :errors_to_map, false
+
+        params = alias_filters(params)
+
+        case run_changeset(existing, params, changeset) do
+          %Ecto.Changeset{valid?: false} = changeset ->
+            if errors_to_map do
+              {:error, EctoSchemaStore.Utils.interpret_errors(changeset, errors_to_map)}
+            else
+              {:error, changeset}
+            end
+          _ -> :ok
+        end
+      end
+
+      @doc """
       Completes an action that was paused to issue a :before_* event.
       """
       def continue(%EventQueues.Event{} = event) do
