@@ -1,6 +1,6 @@
 # Change Log #
 
-## 2.2.1 ##
+## 2.2.2 ##
 
 * Added `validate_insert` and `validate_update` functions to a store module. These can be used to check changeset validation
 before passing to actual insert or update functions.
