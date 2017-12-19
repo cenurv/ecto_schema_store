@@ -39,13 +39,29 @@ defmodule EctoSchemaStore.Edit do
       * `changeset`        - By default use :changeset on the schema otherwise use the provided changeset name.
       * `errors_to_map`    - If an error occurs, the changeset error is converted to a JSON encoding firendly map. When given an atom, sets the root id to the atom. Default: `false`
       """
-      def validate_update(existing, params, opts \\ []) do
+      def validate_update(schema_or_id, params, opts) when is_list schema_or_id do
+        # schema_or_id is a query keyword list.
+        validate_update Enum.into(schema_or_id, %{}), params, opts
+      end
+      def validate_update(schema_or_id, params, opts \\ []) when is_list params do
+        validate_update schema_or_id, Enum.into(params, %{}), opts
+      end
+      def validate_update(schema_or_id, params, opts \\ []) do
+        schema_or_id =
+          if is_map(schema_or_id) and not Map.has_key?(schema_or_id, :__struct__) do
+            # incoming map is a query because it is not a schema struct.
+            # query for the record to update
+            one(schema_or_id)
+          else
+            schema_or_id
+          end
+
         changeset = Keyword.get opts, :changeset, :changeset
         errors_to_map = Keyword.get opts, :errors_to_map, false
 
         params = alias_filters(params)
 
-        case run_changeset(existing, params, changeset) do
+        case run_changeset(schema_or_id, params, changeset) do
           %Ecto.Changeset{valid?: false} = changeset ->
             if errors_to_map do
               {:error, EctoSchemaStore.Utils.interpret_errors(changeset, errors_to_map)}
