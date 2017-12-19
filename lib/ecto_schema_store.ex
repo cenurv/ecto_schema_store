@@ -47,4 +47,14 @@ defmodule EctoSchemaStore do
     end
   end
 
+  @doc """
+  Wraps standard Ecto Repo transaction with a catch for errors throw from a store
+  in order to handle the throwing of errors not from DBConnection more gracefully.
+  """
+  def transaction(repo, fun) do
+    repo.transaction fun
+  catch
+    %Ecto.Changeset{} = error -> {:error, error}
+    %{} = error -> {:error, error}
+  end
 end

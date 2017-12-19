@@ -584,6 +584,14 @@ defmodule EctoSchemaStore.Edit do
       def delete_all(query_params) do
         repo().delete_all build_query!(query_params)
       end
+
+      @doc """
+      Wraps standard Ecto Repo transaction with a catch for errors throw from a store
+      in order to handle the throwing of errors not from DBConnection more gracefully.
+      """
+      def transaction(fun) do
+        EctoSchemaStore.transaction(repo(), fun)
+      end
     end
   end
 end
