@@ -1,5 +1,11 @@
 # Change Log #
 
+## 2.2.3 ##
+
+* Added support for capturing non-DBConnection errors in a Ecto Repo transaction. A store will throw either the changeset with the
+error information or a JSON friendly error map when using a ! function. This new function either on a store or on `EctoSchemaStore`
+will capture this instance and return a code friendly `{:error, Ecto.Changeset | Map}` instead of continuing to throw the error.
+
 ## 2.2.2 ##
 
 * Added `validate_insert` and `validate_update` functions to a store module. These can be used to check changeset validation

@@ -381,6 +381,36 @@ only one will be used.
 PersonStore.insert! %{"name" => "Bob", email: "bob2@nowhere.test"}
 ```
 
+## Transaction ##
+
+Under normal circumstances, the regular Ecto Repo `transaction` function can be used normally; if you would like to use
+the `!` functions in a store you will need to use the `EctoSchemaStore.transaction` or the store specific
+`transaction` function to return a friendlier error tuple instead of passing the throw up the chain.
+
+```elixir
+{:error, changeset_or_map} =
+  PersonStore.transaction fn ->
+    PersonStore.insert! age: "bad value"
+  end
+
+# Manual rollback
+{:error, message} =
+  PersonStore.transaction fn ->
+    PersonStore.repo.rollback(message)
+  end
+
+# Using directly
+{:error, changeset_or_map} =
+  EctoSchemaStore.transaction MyApp.Repo, fn ->
+    PersonStore.insert! name: "Bob"
+    OtherStore.update! field: "bad value"
+  end
+```
+
+Although the `transaction` function can be called on a store module, it only proxies to the `EctoSchemaStore` module
+passing in the repo associated with the store. The call can be used with any combination of stores or the Ecto Repo
+itself.
+
 ## Generator Factories ##
 
 Sometimes, such as in unit testing, a developer would like to create a common predefined data structure
