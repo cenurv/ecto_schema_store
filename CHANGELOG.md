@@ -1,5 +1,10 @@
 # Change Log #
 
+## 2.2.4 ##
+
+* Return `nil` when passing `nil` into `one` for the filter params or id. Previously was throwing an unmatched `build_query` function call error.
+* Fixed `count_records` when counting all records in a table with no filter options. Function can now take no parameters. `PersonStore.count_records`.
+
 ## 2.2.3 ##
 
 * Added support for capturing non-DBConnection errors in a Ecto Repo transaction. A store will throw either the changeset with the

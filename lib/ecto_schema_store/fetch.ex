@@ -74,7 +74,7 @@ defmodule EctoSchemaStore.Fetch do
       @doc """
       Cound the number of records that met that query.
       """
-      def count_records(filters)
+      def count_records(filters \\ [])
       def count_records(%Ecto.Query{} = query) do
         query =
           from q in query,
@@ -101,6 +101,7 @@ defmodule EctoSchemaStore.Fetch do
       * `order_by`             - Order the results by a the provided keyword list.
       """
       def one(filters, opts \\ [])
+      def one(nil, _opts), do: nil
       def one(id, opts) when is_binary(id), do: one String.to_integer(id), opts
       def one(id, opts) when is_integer(id) and id > 0, do: one %{id: id}, opts
       def one(%Ecto.Query{} = query, opts) do

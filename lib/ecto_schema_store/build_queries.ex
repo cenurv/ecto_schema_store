@@ -116,7 +116,8 @@ defmodule EctoSchemaStore.BuildQueries do
       def schema_fields, do: unquote(keys)
       def schema_associations, do: unquote(assocs)
 
-      defp build_query(query, []), do: {:ok, query}
+      defp build_query(%Ecto.Query{} = query, []), do: {:ok, query}
+      defp build_query(query, []), do: {:ok, from(q in query)} # Schema name only, convert into query to avoid errors.
       defp build_query(query, [{key, value} | t]) do
         case build_keyword_query(query, key, value) do
           {:ok, query} -> build_query query, t
