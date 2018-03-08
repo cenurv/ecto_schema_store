@@ -46,6 +46,7 @@ defmodule EctoSchemaStore.Proxy do
   * `validate_insert`
   * `validate_update`
   * `transaction`
+  * `refresh`
 
   ```
   defmodule Person do
@@ -85,7 +86,8 @@ defmodule EctoSchemaStore.Proxy do
                         find_or_create_fields: 2, find_or_create_fields!: 2,
                         validate_insert: 1, validate_insert: 2,
                         validate_update: 2, validate_update: 3,
-                        transaction: 1
+                        transaction: 1,
+                        refresh: 1
                        ]
 
   defmacro __using__(opts) do
