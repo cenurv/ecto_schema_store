@@ -1,5 +1,9 @@
 # Change Log #
 
+## 2.3.0 ##
+
+* Added Store proxy method generation to allow schema modules to expose the store modules directly.
+
 ## 2.2.4 ##
 
 * Return `nil` when passing `nil` into `one` for the filter params or id. Previously was throwing an unmatched `build_query` function call error.

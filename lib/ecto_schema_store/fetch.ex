@@ -183,17 +183,6 @@ defmodule EctoSchemaStore.Fetch do
       end
       def to_map(record), do: convert_model_to_map record
 
-      @doc """
-      ## Deprecated ##
-
-      Convert the provided record to a generic map and Ecto date or time values to
-      Elixir 1.3 equivalents.
-      """
-      def destructure(record) do
-        Logger.warn "The destructure function is deprecated. Please use to_map on a Store. Occurring on a call to #{__MODULE__}"
-        to_map record
-      end
-
       defp convert_model_to_map(model, convert_ecto \\ true)
       defp convert_model_to_map(nil, _convert_ecto), do: nil
       defp convert_model_to_map(%{} = model, convert_ecto) do

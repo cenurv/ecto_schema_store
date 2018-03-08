@@ -7,7 +7,7 @@ With the following schema:
 
 ```elixir
 defmodule Person do
-  use EctoTest.Web, :model
+  use Ecto.Schema, :model
 
   schema "people" do
     field :name, :string
@@ -70,7 +70,7 @@ PersonStore.preload_assocs record, :field_name
 PersonStore.preload_assocs record, :all
 PersonStore.preload_assocs record, [:field_name_1, :field_name_2]
 
-# Destructure
+# To Map
 record = PersonStore.to_map PersonStore.one 12
 ```
 
@@ -589,3 +589,64 @@ defmodule PersonEventHandler do
    def handle(_), do: nil
 end
 ```
+
+## Proxy Store Functions Through Schema ##
+
+If you happen to come from other programming environments, you may have used an ORM that places store style functions
+directly on the entity or what in the case of Ecto is called a schema. EctoSchemaStore provides a modules that will
+allow you to include some of the store functions directly into the schema module.
+
+```elixir
+defmodule Person do
+  use Ecto.Schema, :model
+  use EctoSchemaStore.Proxy, store: PersonStore
+
+  schema "people" do
+    field :name, :string
+    field :email, :string
+
+    timestamps
+  end
+
+  def changeset(model, params) do
+    model
+    |> cast(params, [:name, :email])
+  end
+end
+
+defmodule PersonStore do
+  use EctoSchemaStore, schema: Person, repo: MyApp.Repo
+end
+
+# Get all records in a table.
+Person.all
+
+# Get all records fields that match the provided value.
+Person.all %{name: "Bob"}
+Person.all %{name: "Bob", email: "bob@nowhere.test"}
+Person.all name: "Bob", email: "bob@nowhere.test"
+
+# Return a single record.
+Person.one %{name: "Bob"}
+Person.one name: "Bob"
+
+# Return a specific record by id.
+Person.one 12
+
+# Refresh
+record = Person.one 12
+record = Person.refresh record
+
+# Preload after query
+Person.preload_assocs record, :field_name
+Person.preload_assocs record, :all
+Person.preload_assocs record, [:field_name_1, :field_name_2]
+
+# To Map
+record = Person.to_map Person.one 12
+```
+
+If a store is not provided, the proxy take the current schema module name and append `.Store` to the end of it.
+So the default for `Person` would be `Person.Store`.
+
+To figure out what store is proxied into a module you can call the `store` function on the schema module.
