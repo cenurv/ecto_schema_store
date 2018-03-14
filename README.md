@@ -7,7 +7,7 @@ With the following schema:
 
 ```elixir
 defmodule Person do
-  use Ecto.Schema, :model
+  use Ecto.Schema
 
   schema "people" do
     field :name, :string
@@ -598,7 +598,7 @@ allow you to include some of the store functions directly into the schema module
 
 ```elixir
 defmodule Person do
-  use Ecto.Schema, :model
+  use Ecto.Schema
   use EctoSchemaStore.Proxy, store: PersonStore
 
   schema "people" do
