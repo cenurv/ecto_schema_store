@@ -101,7 +101,7 @@ defmodule EctoSchemaStore.Proxy do
         end
       else
         quote do
-          @__store_module__ module
+          @__store_module__ unquote(module)
         end
       end
 

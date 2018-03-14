@@ -1,5 +1,9 @@
 # Change Log #
 
+## 2.3.1 ##
+
+* Fix to unquote variable in Proxy macro.
+
 ## 2.3.0 ##
 
 * Added Store proxy method generation to allow schema modules to expose the store modules directly.
