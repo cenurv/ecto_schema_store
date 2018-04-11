@@ -1,6 +1,19 @@
 defmodule EctoSchemaStore.Utils do
   @moduledoc false
 
+  @doc """
+  Forcibly change the specified fields regardless of if it is a change.
+  """
+  def change_fields(%Ecto.Changeset{} = changeset, []), do: changeset
+  def change_fields(%Ecto.Changeset{} = changeset, [{key, value} | t]) do
+    change_fields(Ecto.Changeset.force_change(changeset, key, value), t)
+  end
+  def change_fields(struct, params) when is_map(params) do
+    change_fields(struct, Enum.into(params, []))
+  end
+  def change_fields(struct, params) when is_list(params), do: change_fields(Ecto.Changeset.change(struct, %{}), params)
+
+
   def remove_from_map(map, key) do
     case Map.pop(map, key) do
       {_, result} -> result
