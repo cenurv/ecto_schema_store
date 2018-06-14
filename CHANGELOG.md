@@ -1,5 +1,9 @@
 # Change Log #
 
+## 2.3.2 ##
+
+* Changed no changset inserts and updates (including insert_fields and update_fields) to always update fields regardless of it is actually a change.
+
 ## 2.3.1 ##
 
 * Fix to unquote variable in Proxy macro.

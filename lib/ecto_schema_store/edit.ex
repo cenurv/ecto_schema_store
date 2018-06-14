@@ -116,9 +116,9 @@ defmodule EctoSchemaStore.Edit do
 
         change =
           if changeset do
-            run_changeset default_value, params, changeset
+            run_changeset(default_value, params, changeset)
           else
-            Ecto.Changeset.change(default_value, params)
+            EctoSchemaStore.Utils.change_fields(default_value, params)
           end
 
         case repo.insert change do
@@ -247,9 +247,9 @@ defmodule EctoSchemaStore.Edit do
 
         change =
           if changeset do
-            run_changeset model, params, changeset
+            run_changeset(model, params, changeset)
           else
-            Ecto.Changeset.change(model, params)
+            EctoSchemaStore.Utils.change_fields(model, params)
           end
 
         input_model = model
