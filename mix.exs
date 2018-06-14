@@ -43,8 +43,9 @@ defmodule EctoStore.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [{:ecto, "~> 2.2"},
-     {:ex_doc, "~> 0.17", only: [:docs, :dev]},
+     {:ex_doc, "~> 0.18", only: [:docs, :dev]},
      {:gettext, "~> 0.13"},
-     {:event_queues, "~> 1.1"}]
+     {:event_queues, "~> 1.1", optional: true},
+     {:faker, "~> 0.10", optional: true}]
   end
 end
