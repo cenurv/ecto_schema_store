@@ -65,40 +65,6 @@ defmodule EctoSchemaStore.Factory do
     end
   end
 
-  defmacro faker(mapping, opts \\ []) when is_list(mapping) do
-    if not Code.ensure_loaded?(Faker) do
-      throw "Faker module not loaded. Please include {:faker, \"~> 0.10.0\"} in your mix.exs file."
-    end
-
-    quote do
-      @doc """
-      The Faker module mapping for schema keys.
-      """
-      def faker_mapping, do: Enum.into(unquote(mapping), %{})
-
-      def fake, do: fake(schema().__schema__(:fields))
-      def fake(allowed_keys) do
-        mapping = faker_mapping()
-        params =
-          for key <- Map.keys(mapping) do
-            if key in allowed_keys do
-              if is_function(mapping[key]) do
-                mapping[key].()
-              else
-                {module, function} = mapping[key]
-                module = Module.concat(Faker, module)
-                {key, apply(module, function, [])}
-              end
-            else
-              nil
-            end
-          end
-
-        Enum.reject(params, &(is_nil(&1)))
-      end
-    end
-  end
-
   defmacro factory(function, do: block) do
     name = elem(function, 0)
 
