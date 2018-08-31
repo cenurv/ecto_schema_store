@@ -1,12 +1,12 @@
 defmodule EctoStore.Mixfile do
   use Mix.Project
 
-  @version "2.3.2"
+  @version "2.4.0"
 
   def project do
     [app: :ecto_schema_store,
      version: @version,
-     elixir: "~> 1.4",
+     elixir: "~> 1.5",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      compilers: [:gettext] ++ Mix.compilers,
@@ -43,8 +43,8 @@ defmodule EctoStore.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [{:ecto, "~> 2.2"},
-     {:ex_doc, "~> 0.18", only: [:docs, :dev]},
-     {:gettext, "~> 0.13"},
-     {:event_queues, "~> 1.1", optional: true}]
+     {:ex_doc, "~> 0.19", only: [:docs, :dev]},
+     {:gettext, "~> 0.15"},
+     {:event_queues, "~> 3.0", optional: true}]
   end
 end

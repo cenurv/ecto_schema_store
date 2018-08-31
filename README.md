@@ -304,6 +304,22 @@ PersonStore.delete_all query_params
 PersonStore.delete_all
 ```
 
+## Logging Edit Actions ##
+
+A store can enable logging for all edit actions performed through the store module. Successful actions use `Logger.info` while failures use `Logger.warn`.
+
+```elixir
+defmodule PersonStore do
+  use EctoSchemaStore, schema: Person, repo: MyApp.Repo, logging: true
+end
+```
+
+Sample Insert Output:
+
+```
+iex(1)> PersonStore.insert [], changeset: :insert_changeset, errors_to_map: :person
+[warn] Elixir.Person action `insert` using opts `[timeout: 5000, sync: true, changeset: :insert_changeset, errors_to_map: :person]` failed due to %{"person.email" => ["can't be blank"], "person.name" => ["can't be blank"]}
+```
 
 ## References ##
 

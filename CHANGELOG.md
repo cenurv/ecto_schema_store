@@ -1,5 +1,16 @@
 # Change Log #
 
+## 2.4.0 ##
+
+* Added `logging` option when creating a store. This will cause the store log edit actions using `info` for success and `warn` for changes that could not be completed.
+
+Sample Insert Output:
+
+```
+iex(1)> PersonStore.insert [], changeset: :insert_changeset, errors_to_map: :person
+[warn] Elixir.Person action `insert` using opts `[timeout: 5000, sync: true, changeset: :insert_changeset, errors_to_map: :person]` failed due to %{"person.email" => ["can't be blank"], "person.name" => ["can't be blank"]}
+```
+
 ## 2.3.2 ##
 
 * Changed no changset inserts and updates (including insert_fields and update_fields) to always update fields regardless of it is actually a change.

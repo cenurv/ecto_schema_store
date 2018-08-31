@@ -123,12 +123,17 @@ defmodule EctoSchemaStore.Edit do
 
         case repo.insert change do
           {:error, changeset} = error ->
+            errors = EctoSchemaStore.Utils.interpret_errors(changeset, errors_to_map || "root")
+            log_failure(nil, :insert, opts, errors)
+
             if errors_to_map do
-              {:error, EctoSchemaStore.Utils.interpret_errors(changeset, errors_to_map)}
+              {:error, errors}
             else
               error
             end
           {:ok, model} = result ->
+            log_success(model.id, :insert)
+
             if has_after_insert?() do
               event = EctoSchemaStore.Event.new current_action: :after_insert,
                                                         previous_model: default_value,
@@ -256,12 +261,17 @@ defmodule EctoSchemaStore.Edit do
 
         case repo.update change do
           {:error, changeset} = error ->
+            errors = EctoSchemaStore.Utils.interpret_errors(changeset, errors_to_map || "root")
+            log_failure(model.id, :insert, opts, errors)
+
             if errors_to_map do
-              {:error, EctoSchemaStore.Utils.interpret_errors(changeset, errors_to_map)}
+              {:error, errors}
             else
               error
             end
           {:ok, model} = result ->
+            log_success(model.id, :update)
+
             if has_after_update?() do
               event = EctoSchemaStore.Event.new current_action: :after_update,
                                                         previous_model: input_model,
@@ -503,8 +513,12 @@ defmodule EctoSchemaStore.Edit do
         repo = unquote(repo)
 
         case repo.delete model do
-          {:error, _} = error -> error
+          {:error, message} = error ->
+            log_failure(model.id, :delete, [], message)
+            error
           {:ok, model} = result ->
+            log_success(model.id, :delete)
+
             if has_after_delete?() do
               event = EctoSchemaStore.Event.new current_action: :after_delete,
                                                         previous_model: model,

@@ -9,6 +9,7 @@ defmodule EctoSchemaStore do
   defmacro __using__(opts) do
     schema = Keyword.get opts, :schema
     repo = Keyword.get opts, :repo
+    logging = Keyword.get opts, :logging
 
     quote do
       import EctoSchemaStore
@@ -38,6 +39,21 @@ defmodule EctoSchemaStore do
       Returns a reference to the Ecto Repo module `#{unquote(repo)}`.
       """
       def repo, do: unquote(repo)
+
+      if unquote(logging) do
+        require Logger
+
+        def log_success(id, action), do: Logger.info("#{schema()} action `#{action}` success for #{id}")
+        def log_failure(nil, action, opts, errors) do
+          Logger.warn "#{schema()} action `#{action}` using opts `#{inspect(opts)}` failed due to #{inspect(errors)}"
+        end
+        def log_failure(id, action, opts, errors) do
+          Logger.warn "#{schema()} action `#{action}` using opts `#{inspect(opts)}` for `#{id}` failed due to #{inspect(errors)}"
+        end
+      else
+        def log_success(_id, _action), do: nil
+        def log_failure(_id, _action, _opts, _changeset), do: nil
+      end
 
       EctoSchemaStore.Alias.build
       EctoSchemaStore.BuildQueries.build(unquote(schema))
