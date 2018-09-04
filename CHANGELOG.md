@@ -1,5 +1,10 @@
 # Change Log #
 
+
+## 2.4.1 ##
+
+* Corrected logging name for failed update.
+
 ## 2.4.0 ##
 
 * Added `logging` option when creating a store. This will cause the store log edit actions using `info` for success and `warn` for changes that could not be completed.

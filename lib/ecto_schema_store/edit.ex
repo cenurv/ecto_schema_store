@@ -262,7 +262,7 @@ defmodule EctoSchemaStore.Edit do
         case repo.update change do
           {:error, changeset} = error ->
             errors = EctoSchemaStore.Utils.interpret_errors(changeset, errors_to_map || "root")
-            log_failure(model.id, :insert, opts, errors)
+            log_failure(model.id, :update, opts, errors)
 
             if errors_to_map do
               {:error, errors}
