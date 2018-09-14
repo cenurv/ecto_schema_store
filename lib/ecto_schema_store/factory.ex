@@ -60,7 +60,7 @@ defmodule EctoSchemaStore.Factory do
         generate_prepare_fields Enum.into(fields, %{})
       end
       defp generate_prepare_fields(fields) when is_map fields do
-        alias_filters(fields)
+        fields
       end
     end
   end

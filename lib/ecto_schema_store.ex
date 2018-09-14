@@ -18,7 +18,6 @@ defmodule EctoSchemaStore do
       require EctoSchemaStore.BuildQueries
       require EctoSchemaStore.Edit
       require EctoSchemaStore.Factory
-      import EctoSchemaStore.Alias
       import Ecto.Changeset
       import Ecto.Query, except: [update: 3, update: 2]
       import EctoSchemaStore.Factory
@@ -55,7 +54,6 @@ defmodule EctoSchemaStore do
         def log_failure(_id, _action, _opts, _changeset), do: nil
       end
 
-      EctoSchemaStore.Alias.build
       EctoSchemaStore.BuildQueries.build(unquote(schema))
       EctoSchemaStore.Fetch.build(unquote(schema), unquote(repo))
       EctoSchemaStore.Edit.build(unquote(schema), unquote(repo))

@@ -60,8 +60,6 @@ defmodule EctoSchemaStore.Edit do
         changeset = Keyword.get opts, :changeset, :changeset
         errors_to_map = Keyword.get opts, :errors_to_map, false
 
-        params = alias_filters(params)
-
         case run_changeset(schema_or_id, params, changeset) do
           %Ecto.Changeset{valid?: false} = changeset ->
             if errors_to_map do
@@ -186,7 +184,6 @@ defmodule EctoSchemaStore.Edit do
         sync = Keyword.get opts, :sync
 
         default_value = struct unquote(schema), %{}
-        params = alias_filters(params)
 
         if has_before_insert?() do
           event = EctoSchemaStore.Event.new current_action: :before_insert,
@@ -317,8 +314,6 @@ defmodule EctoSchemaStore.Edit do
         opts = Keyword.merge default_edit_options(), opts
         timeout = Keyword.get opts, :timeout
         sync = Keyword.get opts, :sync
-
-        params = alias_filters(params)
 
         model =
           if is_integer id_or_model do

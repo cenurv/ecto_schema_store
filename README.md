@@ -365,22 +365,6 @@ defmodule PersonStore do
 end
 ```
 
-## Schema Field Aliases ##
-
-Sometimes field names get changed or the developer wishes to have an alias that represents another field.
-These work for both querying and editing schema models.
-
-```elixir
-defmodule PersonStore do
-  use EctoSchemaStore, schema: Person, repo: MyApp.Repo
-
-  alias_fields email_address: :email
-end
-
-PersonStore.all %{email_address: "bob@nowhere.test"}
-PersonStore.update! 12, %{email_address: "bob@nowhere.test"}
-```
-
 ## Filter or Params Map/Keyword List ##
 
 Many of the API calls used by a store take a map of fields as input. Normal Ecto

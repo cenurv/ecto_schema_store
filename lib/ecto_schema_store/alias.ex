@@ -1,5 +1,6 @@
 defmodule EctoSchemaStore.Alias do
   @moduledoc false
+  # Deprecated
 
   defmacro build do
     quote do

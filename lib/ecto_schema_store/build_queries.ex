@@ -1,132 +1,78 @@
 defmodule EctoSchemaStore.BuildQueries do
   @moduledoc false
+  import Ecto.Query
 
-  defmacro build_ecto_query(query, :is_nil, key) do
-    quote do
-      from q in unquote(query),
-      where: is_nil(field(q, ^unquote(key)))
-    end
+  defp build_keyword_query(query, field_name, {:like, value}) do
+    from q in query,
+    where: like(field(q, ^field_name), ^value)
   end
-  defmacro build_ecto_query(query, :not_nil, key) do
-    quote do
-      from q in unquote(query),
-      where: not is_nil(field(q, ^unquote(key)))
-    end
+  defp build_keyword_query(query, field_name, {:ilike, value}) do
+    from q in query,
+    where: ilike(field(q, ^field_name), ^value)
   end
-  defmacro build_ecto_query(query, :like, key, value) do
-    quote do
-      from q in unquote(query),
-      where: like(field(q, ^unquote(key)), unquote(value))
-    end
+  defp build_keyword_query(query, field_name, {:in, value}) do
+    from q in query,
+    where: field(q, ^field_name) in ^value
   end
-  defmacro build_ecto_query(query, :ilike, key, value) do
-    quote do
-      from q in unquote(query),
-      where: ilike(field(q, ^unquote(key)), unquote(value))
-    end
+  defp build_keyword_query(query, field_name, {:>=, value}) do
+    from q in query,
+    where: field(q, ^field_name) >= ^value
   end
-  defmacro build_ecto_query(query, :eq, key, value) do
-    quote do
-      from q in unquote(query),
-      where: field(q, ^unquote(key)) == unquote(value)
-    end
+  defp build_keyword_query(query, field_name, {:>, value}) do
+    from q in query,
+    where: field(q, ^field_name) > ^value
   end
-  defmacro build_ecto_query(query, :not, key, value) do
-    quote do
-      from q in unquote(query),
-      where: field(q, ^unquote(key)) != unquote(value)
-    end
+  defp build_keyword_query(query, field_name, {:<=, value}) do
+    from q in query,
+    where: field(q, ^field_name) <= ^value
   end
-  defmacro build_ecto_query(query, :lt, key, value) do
-    quote do
-      from q in unquote(query),
-      where: field(q, ^unquote(key)) < unquote(value)
-    end
+  defp build_keyword_query(query, field_name, {:<, value}) do
+    from q in query,
+    where: field(q, ^field_name) < ^value
   end
-  defmacro build_ecto_query(query, :lte, key, value) do
-    quote do
-      from q in unquote(query),
-      where: field(q, ^unquote(key)) <= unquote(value)
-    end
+  defp build_keyword_query(query, field_name, {:!=, nil}) do
+    from q in query,
+    where: not is_nil(field(q, ^field_name))
   end
-  defmacro build_ecto_query(query, :gt, key, value) do
-    quote do
-      from q in unquote(query),
-      where: field(q, ^unquote(key)) > unquote(value)
-    end
+  defp build_keyword_query(query, field_name, {:==, nil}) do
+    from q in query,
+    where: is_nil(field(q, ^field_name))
   end
-  defmacro build_ecto_query(query, :gte, key, value) do
-    quote do
-      from q in unquote(query),
-      where: field(q, ^unquote(key)) >= unquote(value)
-    end
+  defp build_keyword_query(query, field_name, {:!=, value}) do
+    from q in query,
+    where: field(q, ^field_name) != ^value
   end
-  defmacro build_ecto_query(query, :in, key, value) do
-    quote do
-      from q in unquote(query),
-      where: field(q, ^unquote(key)) in unquote(value)
-    end
+  defp build_keyword_query(query, field_name, {:==, value}) do
+    from q in query,
+    where: field(q, ^field_name) == ^value
   end
+  defp build_keyword_query(query, field_name, nil) do
+    build_keyword_query(query, field_name, {:==, nil})
+  end
+  defp build_keyword_query(query, field_name, value) do
+    build_keyword_query(query, field_name, {:==, value})
+  end
+
+  def build_query(%Ecto.Query{} = query, []), do: {:ok, query}
+  def build_query(query, []), do: {:ok, from(q in query)} # Schema name only, convert into query to avoid errors.
+  def build_query(query, [{key, value} | t]) do
+    build_query(build_keyword_query(query, key, value), t)
+  end
+  def build_query(query, %{} = filters) do
+    build_query query, Enum.into(filters, [])
+  end
+
 
   defmacro build(schema) do
-    keys = EctoSchemaStore.Utils.keys(Macro.expand(schema, __CALLER__), false)
-    assocs = EctoSchemaStore.Utils.keys(Macro.expand(schema, __CALLER__), true)
+    keys = Macro.expand(schema, __CALLER__).__schema__(:fields)
+    associations = Macro.expand(schema, __CALLER__).__schema__(:associations)
 
     quote do
-      defp build_keyword_query(query, field_name, {:like, value}) do
-        {:ok, EctoSchemaStore.BuildQueries.build_ecto_query(query, :like, field_name, ^value)}
-      end
-      defp build_keyword_query(query, field_name, {:ilike, value}) do
-        {:ok, EctoSchemaStore.BuildQueries.build_ecto_query(query, :ilike, field_name, ^value)}
-      end
-      defp build_keyword_query(query, field_name, {:in, value}) do
-        {:ok, EctoSchemaStore.BuildQueries.build_ecto_query(query, :in, field_name, ^value)}
-      end
-      defp build_keyword_query(query, field_name, {:>=, value}) do
-        {:ok, EctoSchemaStore.BuildQueries.build_ecto_query(query, :gte, field_name, ^value)}
-      end
-      defp build_keyword_query(query, field_name, {:>, value}) do
-        {:ok, EctoSchemaStore.BuildQueries.build_ecto_query(query, :gt, field_name, ^value)}
-      end
-      defp build_keyword_query(query, field_name, {:<=, value}) do
-        {:ok, EctoSchemaStore.BuildQueries.build_ecto_query(query, :lte, field_name, ^value)}
-      end
-      defp build_keyword_query(query, field_name, {:<, value}) do
-        {:ok, EctoSchemaStore.BuildQueries.build_ecto_query(query, :lt, field_name, ^value)}
-      end
-      defp build_keyword_query(query, field_name, {:!=, nil}) do
-        {:ok, EctoSchemaStore.BuildQueries.build_ecto_query(query, :not_nil, field_name)}
-      end
-      defp build_keyword_query(query, field_name, {:==, nil}) do
-        {:ok, EctoSchemaStore.BuildQueries.build_ecto_query(query, :is_nil, field_name)}
-      end
-      defp build_keyword_query(query, field_name, {:!=, value}) do
-        {:ok, EctoSchemaStore.BuildQueries.build_ecto_query(query, :not, field_name, ^value)}
-      end
-      defp build_keyword_query(query, field_name, {:==, value}) do
-        {:ok, EctoSchemaStore.BuildQueries.build_ecto_query(query, :eq, field_name, ^value)}
-      end
-      defp build_keyword_query(query, field_name, nil) do
-        {:ok, EctoSchemaStore.BuildQueries.build_ecto_query(query, :is_nil, field_name)}
-      end
-      defp build_keyword_query(query, field_name, value) do
-        {:ok, EctoSchemaStore.BuildQueries.build_ecto_query(query, :eq, field_name, ^value)}
-      end
 
       def schema_fields, do: unquote(keys)
-      def schema_associations, do: unquote(assocs)
+      def schema_associations, do: unquote(associations)
 
-      defp build_query(%Ecto.Query{} = query, []), do: {:ok, query}
-      defp build_query(query, []), do: {:ok, from(q in query)} # Schema name only, convert into query to avoid errors.
-      defp build_query(query, [{key, value} | t]) do
-        case build_keyword_query(query, key, value) do
-          {:ok, query} -> build_query query, t
-          {:error, _message} = error -> error
-        end
-      end
-      defp build_query(query, %{} = filters) do
-        build_query query, Enum.into(filters, [])
-      end
+      defdelegate build_query(query, filters), to: EctoSchemaStore.BuildQueries
 
       @doc """
       Build an `Ecto.Query` from the provided fields and values map. A keyword list builds
@@ -136,7 +82,7 @@ defmodule EctoSchemaStore.BuildQueries do
       """
       def build_query(filters \\ [])
       def build_query(filters) do
-        build_query unquote(schema), alias_filters(filters)
+        build_query unquote(schema), filters
       end
 
       @doc """
