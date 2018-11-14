@@ -1,5 +1,8 @@
 # Change Log #
 
+## 3.0.0 ##
+
+* Ecto 3.0 compatibility, to use Ecto 2 downgrade to EctoSchemaStore 2.4.1.
 
 ## 2.4.1 ##
 
