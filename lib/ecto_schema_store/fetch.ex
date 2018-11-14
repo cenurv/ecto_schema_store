@@ -198,9 +198,6 @@ defmodule EctoSchemaStore.Fetch do
       defp convert_model_to_map(value, _convert_ecto), do: value
 
       defp convert_value(key, %Ecto.Association.NotLoaded{}, true), do: {key, :not_loaded}
-      defp convert_value(key, %Ecto.Time{} = value, true), do: {key, value |> Ecto.Time.to_erl |> Time.from_erl!}
-      defp convert_value(key, %Ecto.Date{} = value, true), do: {key, value |> Ecto.Date.to_erl |> Date.from_erl!}
-      defp convert_value(key, %Ecto.DateTime{} = value, true), do: {key, value |> Ecto.DateTime.to_erl |> NaiveDateTime.from_erl!}
       defp convert_value(key, %DateTime{} = value, true), do: {key, value}
       defp convert_value(key, %Date{} = value, true), do: {key, value}
       defp convert_value(key, %Time{} = value, true), do: {key, value}
